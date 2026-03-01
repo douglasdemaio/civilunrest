@@ -124,6 +124,26 @@
     .specs-table td { padding: 12px 24px; border-bottom: 1px solid rgba(247,231,117,0.15); }
     .specs-table td:first-child { color: var(--gold); font-weight: 600; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
 
+    /* Expansion */
+    .expansion-card {
+      background: linear-gradient(135deg, var(--olive-dark), #3a3828);
+      border: 2px solid var(--gold); border-radius: 12px;
+      padding: 48px 40px; max-width: 680px; margin: 0 auto; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .expansion-badge {
+      display: inline-block; background: var(--red); color: #fff;
+      font-family: 'Oswald', sans-serif; font-size: 0.8em; font-weight: 700;
+      letter-spacing: 2px; padding: 4px 16px; border-radius: 3px; margin-bottom: 16px;
+    }
+    .expansion-card h3 { font-family: 'Oswald', sans-serif; color: var(--gold); font-size: 1.8em; margin-bottom: 16px; }
+    .expansion-desc { font-size: 1.05em; line-height: 1.7; margin-bottom: 24px; opacity: 0.9; }
+    .expansion-features {
+      list-style: none; display: inline-block; text-align: left; margin-bottom: 32px;
+    }
+    .expansion-features li { padding: 6px 0; font-size: 1em; }
+    .expansion-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
     /* CTA banner */
     .cta-banner {
       background: var(--olive); text-align: center; padding: 80px 24px;
@@ -262,11 +282,37 @@
     </table>
   </section>
 
+  <!-- EXPANSION -->
+  <section id="expansion">
+    <h2>Expand the Chaos</h2>
+    <hr class="divider"/>
+    <div class="expansion-card">
+      <div class="expansion-badge">EXPANSION PACK</div>
+      <h3>Civil Unrest: America</h3>
+      <p class="expansion-desc">
+        Add a high-stakes deck that introduces political turmoil unique to the Americas. Corruption, cartel spillover, election chaos, and regional power struggles — drawn whenever you land on a fist icon. Same core rules, amplified tension.
+      </p>
+      <ul class="expansion-features">
+        <li>🇺🇸 America-themed event cards</li>
+        <li>✊ Triggered by fist icon landings</li>
+        <li>🔥 Intensifies crises across all six categories</li>
+        <li>🧩 Seamless integration — no rule changes</li>
+      </ul>
+      <div class="expansion-cta">
+        <a href="https://www.thegamecrafter.com/games/civil-unrest:-america" class="btn-primary">Get the Expansion</a>
+        <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-secondary">Get the Base Game</a>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA BANNER -->
   <section class="cta-banner">
     <h2>Ready to Start the Revolution?</h2>
-    <p>Get your copy of Civil Unrest and bring the battle to your table.</p>
-    <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order Now</a>
+    <p>Get the base game — then supercharge it with the America expansion.</p>
+    <div class="cta-group">
+      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order the Game</a>
+      <a href="https://www.thegamecrafter.com/games/civil-unrest:-america" class="btn-secondary">Add America Pack</a>
+    </div>
   </section>
 
   <!-- FOOTER -->
