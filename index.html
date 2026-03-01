@@ -3,81 +3,278 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Civil Unrest - Board Game</title>
+  <title>Civil Unrest — The Board Game Where Risk Meets Monopoly</title>
+  <meta name="description" content="Civil Unrest is a strategy board game for 1-6 players where territorial conquest meets economic power. Ages 14+. Order now."/>
+  <meta property="og:title" content="Civil Unrest — Board Game"/>
+  <meta property="og:description" content="A strategy board game where Risk meets Monopoly. 1-6 players, ages 14+."/>
+  <meta property="og:image" content="https://douglasdemaio.github.io/civilunrest/Box.png"/>
+  <meta property="og:url" content="https://douglasdemaio.github.io/civilunrest/"/>
+  <meta property="og:type" content="product"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --olive: #5e5944;
+      --olive-dark: #4a4636;
+      --gold: #f7e775;
+      --gold-dark: #d4c44e;
+      --cream: #f3f3f3;
+      --red: #c0392b;
+      --bg-dark: #2c2a20;
+    }
+
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #5e5944;
-      color: #f7e775;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
+      font-family: 'Open Sans', 'Segoe UI', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--cream);
+      line-height: 1.6;
     }
 
-    .logo {
-      margin-top: 30px;
-    }
+    h1, h2, h3 { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
 
-    .logo img {
-      width: 120px;
-      height: auto;
+    /* ===== NAV ===== */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(44,42,32,0.95); backdrop-filter: blur(8px);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 32px; border-bottom: 2px solid var(--gold);
     }
+    nav .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    nav .brand img { height: 36px; }
+    nav .brand span { font-family: 'Oswald', sans-serif; font-size: 1.2em; color: var(--gold); font-weight: 700; letter-spacing: 1px; }
+    nav .buy-btn { background: var(--red); color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-family: 'Oswald', sans-serif; font-size: 1em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: none; transition: background 0.2s; }
+    nav .buy-btn:hover { background: #e74c3c; }
 
-    h1 {
-      font-size: 3em;
-      margin: 20px 0 10px;
+    /* ===== HERO ===== */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 60px;
+      background: linear-gradient(180deg, var(--olive-dark) 0%, var(--bg-dark) 100%);
     }
+    .hero .logo { width: 100px; margin-bottom: 16px; }
+    .hero h1 { font-size: clamp(2.5em, 7vw, 5em); color: var(--gold); letter-spacing: 3px; margin-bottom: 8px; }
+    .hero .tagline { font-size: clamp(1em, 2.5vw, 1.4em); color: var(--cream); opacity: 0.9; margin-bottom: 32px; font-style: italic; }
+    .hero .box-img { width: min(680px, 90vw); border: 3px solid var(--gold); border-radius: 8px; margin-bottom: 40px; }
+    .hero .cta-group { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
 
-    .tagline {
-      font-size: 1.25em;
-      color: #f3f3f3;
-      margin-bottom: 40px;
+    .btn-primary {
+      display: inline-block; background: var(--red); color: #fff;
+      padding: 16px 48px; border: none; border-radius: 4px;
+      font-family: 'Oswald', sans-serif; font-size: 1.3em; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+      text-decoration: none; transition: all 0.2s;
     }
+    .btn-primary:hover { background: #e74c3c; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(231,76,60,0.4); }
 
-    .box-image img {
-      width: 680px;
-      height: auto;
-      border: 4px solid #f7e775;
-      border-radius: 8px;
-      background: #fff;
-      padding: 4px;
+    .btn-secondary {
+      display: inline-block; background: transparent; color: var(--gold);
+      padding: 16px 48px; border: 2px solid var(--gold); border-radius: 4px;
+      font-family: 'Oswald', sans-serif; font-size: 1.3em; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px; cursor: pointer;
+      text-decoration: none; transition: all 0.2s;
     }
+    .btn-secondary:hover { background: var(--gold); color: var(--bg-dark); }
 
+    /* ===== SECTIONS ===== */
+    section { padding: 80px 24px; max-width: 960px; margin: 0 auto; }
+    section h2 { font-size: 2.2em; color: var(--gold); text-align: center; margin-bottom: 40px; letter-spacing: 2px; }
+
+    /* About */
+    .about-text { font-size: 1.15em; text-align: center; max-width: 700px; margin: 0 auto; line-height: 1.8; }
+    .about-text strong { color: var(--gold); }
+
+    /* Features */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 32px; margin-top: 20px;
+    }
+    .feature-card {
+      background: var(--olive-dark); border: 1px solid rgba(247,231,117,0.2);
+      border-radius: 8px; padding: 32px 24px; text-align: center;
+      transition: border-color 0.3s;
+    }
+    .feature-card:hover { border-color: var(--gold); }
+    .feature-card .icon { font-size: 2.5em; margin-bottom: 12px; }
+    .feature-card h3 { color: var(--gold); font-size: 1.2em; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.95em; opacity: 0.85; }
+
+    /* How to play */
+    .steps { counter-reset: step; list-style: none; max-width: 640px; margin: 0 auto; }
+    .steps li {
+      counter-increment: step; position: relative;
+      padding: 20px 20px 20px 72px; margin-bottom: 24px;
+      background: var(--olive-dark); border-radius: 8px;
+      border-left: 3px solid var(--gold);
+    }
+    .steps li::before {
+      content: counter(step); position: absolute; left: 20px; top: 18px;
+      background: var(--gold); color: var(--bg-dark);
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 1.1em;
+    }
+    .steps li h3 { color: var(--gold); margin-bottom: 4px; font-size: 1.1em; }
+    .steps li p { font-size: 0.95em; opacity: 0.85; }
+
+    /* Specs */
+    .specs-table { margin: 0 auto; border-collapse: collapse; font-size: 1.05em; }
+    .specs-table td { padding: 12px 24px; border-bottom: 1px solid rgba(247,231,117,0.15); }
+    .specs-table td:first-child { color: var(--gold); font-weight: 600; font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* CTA banner */
+    .cta-banner {
+      background: var(--olive); text-align: center; padding: 80px 24px;
+      margin: 0; max-width: 100%;
+    }
+    .cta-banner h2 { color: var(--gold); margin-bottom: 16px; }
+    .cta-banner p { font-size: 1.1em; margin-bottom: 32px; opacity: 0.9; }
+
+    /* Divider */
+    .divider { width: 60px; height: 3px; background: var(--gold); margin: 0 auto 40px; border: none; }
+
+    /* Footer */
     footer {
-      margin-top: 50px;
-      font-size: 0.9em;
-      color: #ccc;
+      text-align: center; padding: 40px 24px; font-size: 0.85em;
+      color: #999; border-top: 1px solid rgba(247,231,117,0.1);
+    }
+    footer a { color: var(--gold); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      nav { padding: 10px 16px; }
+      nav .brand span { display: none; }
+      section { padding: 60px 16px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="logo">
-    <img src="logo.png" alt="Civil Unrest Logo">
-  </div>
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="brand">
+      <img src="logo.png" alt="Civil Unrest"/>
+      <span>Civil Unrest</span>
+    </a>
+    <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="buy-btn">Buy Now</a>
+  </nav>
 
-  <h1>CIVIL UNREST</h1>
+  <!-- HERO -->
+  <section class="hero">
+    <img src="logo.png" alt="Civil Unrest Logo" class="logo"/>
+    <h1>Civil Unrest</h1>
+    <p class="tagline">Where Risk Meets Monopoly &bull; 1–6 Players &bull; Ages 14+</p>
+    <img src="Box.png" alt="Civil Unrest Board Game Box" class="box-img"/>
+    <div class="cta-group">
+      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order Your Copy</a>
+      <a href="#how-to-play" class="btn-secondary">Learn More</a>
+    </div>
+  </section>
 
-  <div class="tagline">
-    1 - 6 Players<br>
-    Ages +14
-  </div>
+  <!-- ABOUT -->
+  <section id="about">
+    <h2>The Revolution Is on Your Table</h2>
+    <hr class="divider"/>
+    <p class="about-text">
+      <strong>Civil Unrest</strong> is a strategy board game that blends the territorial conquest of <strong>Risk</strong> with the economic engine of <strong>Monopoly</strong>. Build alliances, seize resources, spark uprisings, and outmaneuver your rivals in a battle for control. Every decision matters. Every alliance can shatter. Will you lead the revolution — or crush it?
+    </p>
+  </section>
 
-  <div class="box-image">
-    <img src="Box.png" alt="Civil Unrest Board Game Box">
-  </div>
+  <!-- FEATURES -->
+  <section id="features">
+    <h2>Why You'll Love It</h2>
+    <hr class="divider"/>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon">⚔️</div>
+        <h3>Strategic Depth</h3>
+        <p>Territory control meets resource management. Plan your moves, read your opponents, and adapt or fall.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🤝</div>
+        <h3>Shifting Alliances</h3>
+        <p>Forge deals, break promises, and backstab at just the right moment. Diplomacy is a weapon.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">💰</div>
+        <h3>Economic Warfare</h3>
+        <p>Control trade routes, tax your rivals, and bankrupt the opposition. Money wins wars.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">✊</div>
+        <h3>Uprising Mechanic</h3>
+        <p>Push the people too far and face revolt. Balance power with the will of the masses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🎲</div>
+        <h3>High Replayability</h3>
+        <p>Dynamic board states and player-driven chaos mean no two games play the same way.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">👥</div>
+        <h3>1–6 Players</h3>
+        <p>Solo mode for strategists. Full table for chaos. Scales beautifully from duels to all-out war.</p>
+      </div>
+    </div>
+  </section>
 
-  <form action="https://www.thegamecrafter.com/checkout/sku/E96B000C-30BD-11F0-9211-7E256CB82320" method="POST" style="display: inline;"><button type="submit">Buy Civil Unrest</button></form>
+  <!-- HOW TO PLAY -->
+  <section id="how-to-play">
+    <h2>How to Play</h2>
+    <hr class="divider"/>
+    <ol class="steps">
+      <li>
+        <h3>Claim Territory</h3>
+        <p>Place your forces on the board and establish your starting positions. Location is everything.</p>
+      </li>
+      <li>
+        <h3>Build Your Economy</h3>
+        <p>Acquire resources, invest in infrastructure, and generate income to fund your campaigns.</p>
+      </li>
+      <li>
+        <h3>Forge & Break Alliances</h3>
+        <p>Negotiate with other players — trade, treaties, or threats. Trust is a currency you can spend.</p>
+      </li>
+      <li>
+        <h3>Conquer & Control</h3>
+        <p>Expand your territory through strategic combat. But overextend and the people may rise against you.</p>
+      </li>
+      <li>
+        <h3>Win the Game</h3>
+        <p>Achieve dominance through military might, economic supremacy, or political control. Multiple paths to victory.</p>
+      </li>
+    </ol>
+  </section>
 
+  <!-- SPECS -->
+  <section id="specs">
+    <h2>Game Details</h2>
+    <hr class="divider"/>
+    <table class="specs-table">
+      <tr><td>Players</td><td>1 – 6</td></tr>
+      <tr><td>Ages</td><td>14+</td></tr>
+      <tr><td>Play Time</td><td>60 – 120 minutes</td></tr>
+      <tr><td>Genre</td><td>Strategy / Economic / Area Control</td></tr>
+      <tr><td>Made By</td><td>The Game Crafter</td></tr>
+    </table>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <h2>Ready to Start the Revolution?</h2>
+    <p>Get your copy of Civil Unrest and bring the battle to your table.</p>
+    <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order Now</a>
+  </section>
+
+  <!-- FOOTER -->
   <footer>
-    &copy; 2025 Civil Unrest. All rights reserved.<br>
-    Contact: <a href="mailto:douglas.demaio@gmail.com">douglas.demaio@gmail.com</a>
+    <p>&copy; 2025 Civil Unrest. All rights reserved.</p>
+    <p>Contact: <a href="mailto:douglas.demaio@gmail.com">douglas.demaio@gmail.com</a></p>
   </footer>
-<script data-goatcounter="https://civilunrest.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+
+  <script data-goatcounter="https://civilunrest.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
