@@ -1,0 +1,38 @@
+id: com.demaio.CivilUnrest
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+command: civilunrest
+
+finish-args:
+  - --share=ipc
+  - --share=network
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+
+modules:
+  - name: civilunrest
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 app.py ${FLATPAK_DEST}/bin/civilunrest
+      - install -Dm644 com.demaio.CivilUnrest.desktop ${FLATPAK_DEST}/share/applications/com.demaio.CivilUnrest.desktop
+      - install -Dm644 com.demaio.CivilUnrest.metainfo.xml ${FLATPAK_DEST}/share/metainfo/com.demaio.CivilUnrest.metainfo.xml
+      - install -Dm644 com.demaio.CivilUnrest.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/com.demaio.CivilUnrest.png
+      - mkdir -p ${FLATPAK_DEST}/share/civilunrest
+      - cp -a game ${FLATPAK_DEST}/share/civilunrest/
+      - install -Dm644 LICENSE ${FLATPAK_DEST}/share/licenses/com.demaio.CivilUnrest/LICENSE
+    sources:
+      - type: file
+        path: app.py
+      - type: file
+        path: com.demaio.CivilUnrest.desktop
+      - type: file
+        path: com.demaio.CivilUnrest.metainfo.xml
+      - type: file
+        path: com.demaio.CivilUnrest.png
+      - type: file
+        path: ../LICENSE
+      - type: dir
+        path: ../game
+        dest: game

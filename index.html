@@ -47,6 +47,9 @@
     nav .brand span { font-family: 'Oswald', sans-serif; font-size: 1.2em; color: var(--gold); font-weight: 700; letter-spacing: 1px; }
     nav .buy-btn { background: var(--red); color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-family: 'Oswald', sans-serif; font-size: 1em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: none; transition: background 0.2s; }
     nav .buy-btn:hover { background: #e74c3c; }
+    nav .play-btn { background: transparent; color: var(--gold); padding: 10px 22px; border: 2px solid var(--gold); border-radius: 4px; font-family: 'Oswald', sans-serif; font-size: 0.95em; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; text-decoration: none; transition: all 0.2s; }
+    nav .play-btn:hover { background: var(--gold); color: var(--bg-dark); }
+    nav .nav-actions { display: flex; gap: 10px; align-items: center; }
 
     /* ===== HERO ===== */
     .hero {
@@ -179,7 +182,10 @@
       <img src="logo.png" alt="Civil Unrest"/>
       <span>Civil Unrest</span>
     </a>
-    <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="buy-btn">Buy Now</a>
+    <div class="nav-actions">
+      <a href="game/" class="play-btn">Play Online</a>
+      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="buy-btn">Buy Now</a>
+    </div>
   </nav>
 
   <!-- HERO -->
@@ -189,6 +195,7 @@
     <p class="tagline">Where Risk Meets Monopoly &bull; 1–6 Players &bull; Ages 14+</p>
     <img src="Box.png" alt="Civil Unrest Board Game Box" class="box-img"/>
     <div class="cta-group">
+      <a href="game/" class="btn-primary">Play Free Online</a>
       <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order Your Copy</a>
       <a href="#how-to-play" class="btn-secondary">Learn More</a>
     </div>
@@ -282,6 +289,21 @@
     </table>
   </section>
 
+  <!-- DIGITAL EDITION -->
+  <section id="digital">
+    <h2>Play the Digital Edition</h2>
+    <hr class="divider"/>
+    <p class="about-text">
+      Play the full board game free in your browser — six crisis categories, 350+ event cards, the
+      America expansion, AI opponents, and every optional rule. It also ships as a Linux
+      flatpak. Try the storm before you buy it.
+    </p>
+    <div class="cta-group" style="margin-top:32px">
+      <a href="game/" class="btn-primary">Play Free Online</a>
+      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-secondary">Get the Physical Game</a>
+    </div>
+  </section>
+
   <!-- EXPANSION -->
   <section id="expansion">
     <h2>Expand the Chaos</h2>
@@ -318,6 +340,7 @@
   <!-- FOOTER -->
   <footer>
     <p>&copy; 2025 Civil Unrest. All rights reserved.</p>
+    <p>Play the <a href="game/">Digital Edition</a> &bull; <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener">Order the Physical Game</a></p>
     <p>Contact: <a href="mailto:douglas.demaio@gmail.com">douglas.demaio@gmail.com</a></p>
   </footer>
 

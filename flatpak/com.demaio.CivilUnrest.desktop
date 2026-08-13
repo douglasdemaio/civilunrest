@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Civil Unrest
+Comment=A strategy board game of fragile stability, crises, and reform
+Exec=civilunrest
+Icon=com.demaio.CivilUnrest
+Terminal=false
+Type=Application
+Categories=Game;BoardGame;StrategyGame;

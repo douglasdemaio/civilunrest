@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="89mm"
+   height="89mm"
+   viewBox="0 0 89 89"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="Blue Card 16.svg"
+   inkscape:export-filename="Blue Card 16.png"
+   inkscape:export-xdpi="321.06741"
+   inkscape:export-ydpi="321.06741"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.9371905"
+     inkscape:cx="145.20679"
+     inkscape:cy="55.154747"
+     inkscape:window-width="1920"
+     inkscape:window-height="1131"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true">
+    <sodipodi:guide
+       position="44.950125,99.629487"
+       orientation="1,0"
+       id="guide1"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <rect
+       x="159.22865"
+       y="1796.7017"
+       width="290.48471"
+       height="71.007378"
+       id="rect19" />
+    <rect
+       x="497.17743"
+       y="1008.5599"
+       width="306.05466"
+       height="502.3429"
+       id="rect21-0" />
+    <rect
+       x="497.17743"
+       y="1008.5599"
+       width="306.05466"
+       height="502.3429"
+       id="rect21-0-0" />
+    <rect
+       x="497.17743"
+       y="1008.5599"
+       width="306.05466"
+       height="502.3429"
+       id="rect21-0-6" />
+    <rect
+       x="497.17743"
+       y="1008.5599"
+       width="306.05466"
+       height="502.3429"
+       id="rect21-0-02" />
+    <rect
+       x="497.17743"
+       y="1008.5599"
+       width="306.05466"
+       height="502.3429"
+       id="rect21-0-4" />
+    <rect
+       x="497.17743"
+       y="1008.5599"
+       width="306.05466"
+       height="502.3429"
+       id="rect21-0-6-8" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       width="89.005753"
+       height="88.988487"
+       fill="#f3e8d1"
+       id="rect1"
+       style="fill:#ac9393;fill-opacity:1;stroke-width:0.111247"
+       x="0.021114333"
+       y="0.014314171" />
+    <rect
+       style="fill:#000000;stroke:none;stroke-width:0.0736372;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+       id="rect2-6-0-7"
+       width="0.49570912"
+       height="0.074105762"
+       x="-34.032948"
+       y="34.90155"
+       transform="rotate(-87.584928)" />
+    <text
+       xml:space="preserve"
+       style="font-size:4.9389px;line-height:normal;font-family:SUSE;-inkscape-font-specification:SUSE;text-align:center;text-decoration-color:#000000;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke-width:3"
+       x="44.781372"
+       y="34.138287"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="stroke-width:3"
+         x="44.781372"
+         y="34.138287">Journalist imprisoned </tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:3"
+         x="44.781372"
+         y="40.311913"
+         id="tspan3">for exposing corruption.</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:3"
+         x="44.781372"
+         y="46.485535"
+         id="tspan2">(Use Card Value)</tspan></text>
+  </g>
+</svg>
