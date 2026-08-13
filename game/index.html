@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Civil Unrest — Digital Edition</title>
+  <meta name="description" content="Civil Unrest: The Digital Edition — a browser version of the strategy board game where national leaders navigate economic instability, civil discord, natural disasters, demographic stress, global interference, and reform." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/game.css" />
+</head>
+<body>
+
+  <!-- ===== START SCREEN ===== -->
+  <section id="screen-setup" class="screen active">
+    <div class="setup-inner">
+      <img src="assets/logo.png" alt="Civil Unrest" class="setup-logo" />
+      <h1>Civil Unrest</h1>
+      <p class="tagline">A Game of Fragile Stability &bull; The Digital Edition</p>
+
+      <form id="setup-form" class="setup-form">
+        <div class="setup-grid">
+          <div class="setup-col">
+            <h2>Players</h2>
+            <div id="player-slots"></div>
+            <div class="setup-actions">
+              <button type="button" id="add-player-btn" class="btn btn-secondary">+ Add Player</button>
+              <button type="button" id="remove-player-btn" class="btn btn-secondary">− Remove</button>
+            </div>
+          </div>
+
+          <div class="setup-col">
+            <h2>Optional Rules</h2>
+            <label class="opt"><input type="checkbox" id="opt-reform" checked /> <span><b>Reform Victory</b> — 3 red reform cards in a row under 20 unrest wins instantly.</span></label>
+            <label class="opt"><input type="checkbox" id="opt-tyrant" /> <span><b>Tyrant Victory</b> — +25 unrest within 3 consecutive turns wins instantly.</span></label>
+            <label class="opt"><input type="checkbox" id="opt-crisis" /> <span><b>Crisis Mode</b> — every 5 rounds everyone draws a random Yellow card.</span></label>
+            <label class="opt"><input type="checkbox" id="opt-america" /> <span><b>Civil Unrest: America</b> — mixes the expansion deck in and activates fist spaces.</span></label>
+            <label class="opt"><input type="checkbox" id="opt-twodice" /> <span><b>Two Dice Economy</b></span>
+              <select id="twodice-mode" class="subselect" disabled>
+                <option value="total">Use total</option>
+                <option value="highest">Use highest die</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="setup-actions center">
+          <button type="submit" class="btn btn-primary big">Start the Storm</button>
+        </div>
+      </form>
+
+      <div class="setup-buy">
+        <p>Enjoying the digital edition? <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener">Order the physical game on The Game Crafter</a> &bull; <a href="https://www.thegamecrafter.com/games/civil-unrest:-america" target="_blank" rel="noopener">America expansion</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <section id="screen-game" class="screen">
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/logo.png" alt="Civil Unrest" />
+        <span class="brand-title">Civil Unrest</span>
+        <span class="brand-sub">Digital Edition</span>
+      </div>
+      <div class="topbar-actions">
+        <button id="rules-btn" class="btn btn-ghost">Rules</button>
+        <button id="newgame-btn" class="btn btn-ghost">New Game</button>
+        <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener" class="btn btn-buy">Buy the Physical Game</a>
+      </div>
+    </header>
+
+    <div class="game-layout">
+      <div class="board-wrap">
+        <svg id="board" viewBox="0 0 1160 800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Civil Unrest game board"></svg>
+      </div>
+
+      <aside class="sidebar">
+        <div id="players-panel" class="panel"></div>
+        <div id="log-panel" class="panel">
+          <h3>Game Log</h3>
+          <div id="log"></div>
+        </div>
+      </aside>
+    </div>
+
+    <div id="bottom-area" class="bottom-area">
+      <div id="card-area" class="panel event-strip"></div>
+      <div id="turn-panel" class="panel turn-panel"></div>
+    </div>
+  </section>
+
+  <!-- ===== MODAL ===== -->
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    <div id="modal" class="modal"></div>
+  </div>
+
+  <script src="js/board.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/usa.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.demaio.CivilUnrest</id>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+
+  <name>Civil Unrest</name>
+  <summary>A strategy board game of fragile stability, crises, and reform</summary>
+
+  <developer id="com.demaio">
+    <name>Douglas DeMaio</name>
+  </developer>
+
+  <description>
+    <p>Players take on the role of national leaders navigating crises across six interconnected categories: economic instability, civil discord, natural disasters, demographic stress, global interference, and reform.</p>
+    <p>Each turn, roll dice to move around a color-coded board representing different societal challenges. Draw event cards that escalate or occasionally relieve unrest based on real-world scenarios — from mass protests and financial collapse to population crises and international conflicts. Cards and board spaces combine to generate unrest points tracked on each player's sliding Unrest Meter. Accumulating too much unrest leads to national collapse and elimination.</p>
+    <p>Victory goes to the last stable nation — or to the first player to engineer a successful reform pathway, dramatically reducing unrest and achieving a peaceful political transformation.</p>
+    <ul>
+      <li>Faithful digital re-creation of the physical board game and its 350+ event cards</li>
+      <li>1–6 players, hot-seat or AI opponents</li>
+      <li>Optional rules: Reform Victory, Tyrant Victory, Crisis Mode, Two Dice Economy, and the Civil Unrest: America expansion (with black "fist" spaces)</li>
+      <li>Full game log so every roll, move, and card draw is transparent</li>
+    </ul>
+    <p>The physical board game is available to order at www.thegamecrafter.com/games/civil-unrest1, with the America expansion at www.thegamecrafter.com/games/civil-unrest:-america.</p>
+  </description>
+
+  <launchable type="desktop-id">com.demaio.CivilUnrest.desktop</launchable>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#5e5944</color>
+    <color type="primary" scheme_preference="dark">#2c2a20</color>
+  </branding>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="sex-homosexuality">none</content_attribute>
+    <content_attribute id="sex-prostitution">none</content_attribute>
+    <content_attribute id="sex-adultery">none</content_attribute>
+    <content_attribute id="sex-appearance">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">none</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+  </content_rating>
+
+  <url type="homepage">https://github.com/douglasdemaio/civilunrest</url>
+  <url type="bugtracker">https://github.com/douglasdemaio/civilunrest/issues</url>
+  <url type="vcs-browser">https://github.com/douglasdemaio/civilunrest</url>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/douglasdemaio/civilunrest/main/screenshots/digital-edition-setup.png</image>
+      <caption>Digital Edition game setup</caption>
+    </screenshot>
+  </screenshots>
+
+  <releases>
+    <release version="1.0.0" date="2026-08-12">
+      <description>
+        <p>Initial release of the digital edition: browser and flatpak versions, all base-game and America expansion cards, AI opponents, and optional rules.</p>
+      </description>
+    </release>
+  </releases>
+
+  <requires>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <display_length compare="ge">640</display_length>
+  </requires>
+</component>
