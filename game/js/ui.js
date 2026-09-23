@@ -1,4 +1,8 @@
-/* Civil Unrest Digital Edition — UI rendering (DOM + SVG). */
+/* Civil Unrest Digital Edition — UI rendering (DOM + SVG).
+ * Board art mirrors the physical Civil_Unrest_Board_Final.svg /
+ * "Civil Unrest.png": parchment base, overlapping category circles on a
+ * perimeter loop, central CIVIL UNREST fist emblem + six legend boxes,
+ * and a 0-100 unrest meter around the outer edge. */
 window.CU_UI = (function () {
   "use strict";
 
@@ -7,8 +11,6 @@ window.CU_UI = (function () {
   var CATS = CARDS.categories;
 
   var NS = "http://www.w3.org/2000/svg";
-
-  var SPACE_W = 112, SPACE_H = 92;
 
   /* Identity token of the last landing we showed a score-pop for, so the
      animation plays once per drawn card instead of replaying on every render. */
@@ -27,6 +29,15 @@ window.CU_UI = (function () {
     var e = document.createElementNS(NS, tag);
     if (attrs) for (var k in attrs) e.setAttribute(k, attrs[k]);
     return e;
+  }
+
+  function svgText(parent, x, y, str, attrs) {
+    var t = svgEl("text", attrs || {});
+    t.setAttribute("x", x);
+    t.setAttribute("y", y);
+    t.textContent = str;
+    parent.appendChild(t);
+    return t;
   }
 
   function meterColor(u) {
@@ -55,31 +66,213 @@ window.CU_UI = (function () {
     }).join("");
   }
 
+  /* ---------- physical-board pieces ---------- */
+
+  var LEGEND = [
+    { key: "orange", title: ["Demographics", "& Immigration"],
+      items: ["Aging Population", "Brain Drain", "Refugee Wave", "Birth Rate Crash", "Skilled Migration"],
+      x: 245, y: 318 },
+    { key: "purple", title: ["Global Influence", "& Foreign Meddling"],
+      items: ["Proxy War", "Sanctions", "Cyberattack", "Trade War", "Populist Wave"],
+      x: 755, y: 318 },
+    { key: "yellow", title: ["Natural Disasters", "& Climate Events"],
+      items: ["Hurricane", "Wildfires", "Drought", "Floodplain Crisis", "Food Shortage"],
+      x: 245, y: 448 },
+    { key: "blue", title: ["Civil Discord", "& Identity Politics"],
+      items: ["Election Misinformation", "Mass Protest", "Ethnic Tension", "Censorship Backlash"],
+      x: 755, y: 448 },
+    { key: "green", title: ["Economic Pressure"],
+      items: ["Inflation Surge", "Debt Crisis", "Housing Bubble", "Default Risk", "Tax Revolt"],
+      x: 245, y: 578 },
+    { key: "red", title: ["Resource Tokens", "Reform"],
+      items: ["Currency", "Labor", "Public Trust", "Infrastructure"],
+      x: 755, y: 578 }
+  ];
+
+  function drawLegendBox(g, box) {
+    var cat = CATS[box.key] || { color: "#888", name: box.key };
+    var w = 200, h = 108;
+    var bg = svgEl("rect", {
+      x: box.x, y: box.y, width: w, height: h,
+      fill: cat.color, stroke: "#1a1a1a", "stroke-width": 2
+    });
+    g.appendChild(bg);
+    var cx = box.x + w / 2;
+    box.title.forEach(function (line, i) {
+      svgText(g, cx, box.y + 20 + i * 16, line, {
+        "text-anchor": "middle", fill: "#fff",
+        "font-size": 13, "font-weight": 700, "font-family": "Oswald, sans-serif"
+      });
+    });
+    var top = box.y + 20 + box.title.length * 16 + 2;
+    box.items.forEach(function (line, i) {
+      svgText(g, cx, top + i * 13, line, {
+        "text-anchor": "middle", fill: "#1a1a1a", "font-size": 10.5
+      });
+    });
+  }
+
+  function drawCenter(g) {
+    svgText(g, 600, 285, "CIVIL UNREST", {
+      "text-anchor": "middle", fill: "#1a1a1a",
+      "font-size": 62, "font-weight": 700,
+      "font-family": "Oswald, sans-serif", "letter-spacing": 4
+    });
+    /* Black fist emblem with dice, like the physical center. */
+    g.appendChild(svgEl("circle", {
+      cx: 600, cy: 452, r: 118, fill: "#111111",
+      stroke: "#000000", "stroke-width": 5
+    }));
+    svgText(g, 585, 510, "✊", {
+      "text-anchor": "middle", fill: "#e9ddaf", "font-size": 118
+    });
+    /* Two small dice beside the fist. */
+    [[648, 492, -12], [672, 508, 10]].forEach(function (cfg) {
+      var dg = svgEl("g", { transform: "translate(" + cfg[0] + "," + cfg[1] + ") rotate(" + cfg[2] + ")" });
+      dg.appendChild(svgEl("rect", { x: -13, y: -13, width: 26, height: 26, rx: 5, fill: "#fff", stroke: "#000", "stroke-width": 1.5 }));
+      [[-5, -5], [5, 5], [5, -5]].forEach(function (pt) {
+        dg.appendChild(svgEl("circle", { cx: pt[0], cy: pt[1], r: 2.6, fill: "#111" }));
+      });
+      g.appendChild(dg);
+    });
+    LEGEND.forEach(function (b) { drawLegendBox(g, b); });
+  }
+
+  /* Outer 0-100 unrest meter: segmented green->yellow->orange->red bars
+     with ticks every 10 and red-fist corners, like the physical rim. */
+  function unrestSegColor(v) {
+    if (v < 50) return "#57b32e";
+    if (v < 65) return "#efe16e";
+    if (v < 80) return "#f5a742";
+    return "#c62f26";
+  }
+
+  function drawMeterBars(g) {
+    var x0 = 92, x1 = 1108, yB = 848, yT = 52, xl = 52, xr = 1148, yt0 = 92, yt1 = 808;
+
+    function hBar(y, flip) {
+      for (var v = 0; v < 100; v++) {
+        var a = x0 + (v / 100) * (x1 - x0);
+        var b = x0 + ((v + 1) / 100) * (x1 - x0);
+        var seg = svgEl("line", {
+          x1: flip ? x1 - (a - x0) : a, x2: flip ? x1 - (b - x0) : b,
+          y1: y, y2: y, stroke: unrestSegColor(v), "stroke-width": 15
+        });
+        g.appendChild(seg);
+      }
+      g.appendChild(svgEl("line", { x1: x0, x2: x1, y1: y - 8, y2: y - 8, stroke: "#1a1a1a", "stroke-width": 2 }));
+      g.appendChild(svgEl("line", { x1: x0, x2: x1, y1: y + 8, y2: y + 8, stroke: "#1a1a1a", "stroke-width": 2 }));
+      for (var t = 0; t <= 100; t += 10) {
+        var px = flip ? x1 - (t / 100) * (x1 - x0) : x0 + (t / 100) * (x1 - x0);
+        g.appendChild(svgEl("line", { x1: px, x2: px, y1: y - 8, y2: y + 8, stroke: "#1a1a1a", "stroke-width": 2 }));
+        if (t % 20 === 0 && t !== 0 && t !== 100) {
+          svgText(g, px, y + (y > 400 ? 30 : -16), String(t), {
+            "text-anchor": "middle", fill: "#1a1a1a", "font-size": 13, "font-weight": 700
+          });
+        }
+      }
+    }
+
+    function vBar(x, flip) {
+      for (var v = 0; v < 100; v++) {
+        var a = yt0 + (v / 100) * (yt1 - yt0);
+        var b = yt0 + ((v + 1) / 100) * (yt1 - yt0);
+        var y1 = flip ? yt1 - (a - yt0) : a;
+        var y2 = flip ? yt1 - (b - yt0) : b;
+        g.appendChild(svgEl("line", {
+          x1: x, x2: x, y1: y1, y2: y2,
+          stroke: unrestSegColor(v), "stroke-width": 15
+        }));
+      }
+      g.appendChild(svgEl("line", { x1: x - 8, x2: x - 8, y1: yt0, y2: yt1, stroke: "#1a1a1a", "stroke-width": 2 }));
+      g.appendChild(svgEl("line", { x1: x + 8, x2: x + 8, y1: yt0, y2: yt1, stroke: "#1a1a1a", "stroke-width": 2 }));
+      for (var t = 0; t <= 100; t += 10) {
+        var py = flip ? yt1 - (t / 100) * (yt1 - yt0) : yt0 + (t / 100) * (yt1 - yt0);
+        g.appendChild(svgEl("line", { x1: x - 8, x2: x + 8, y1: py, y2: py, stroke: "#1a1a1a", "stroke-width": 2 }));
+        if (t % 20 === 0 && t !== 0 && t !== 100) {
+          svgText(g, x + (x < 600 ? -20 : 20), py + 4, String(t), {
+            "text-anchor": "middle", fill: "#1a1a1a", "font-size": 13, "font-weight": 700
+          });
+        }
+      }
+    }
+
+    hBar(yB, false);
+    hBar(yT, true);
+    vBar(xl, false);
+    vBar(xr, true);
+
+    /* Red fist corners (collapse) + small green zero dots. */
+    [[52, 52], [1148, 52], [52, 848], [1148, 848]].forEach(function (pt) {
+      g.appendChild(svgEl("circle", {
+        cx: pt[0], cy: pt[1], r: 30, fill: "#b23727",
+        stroke: "#1a1a1a", "stroke-width": 3
+      }));
+      svgText(g, pt[0], pt[1] + 9, "✊", {
+        "text-anchor": "middle", fill: "#fff", "font-size": 26
+      });
+    });
+    [[100, 52], [1100, 848], [52, 800], [1148, 100]].forEach(function (pt) {
+      g.appendChild(svgEl("circle", {
+        cx: pt[0], cy: pt[1], r: 13, fill: "#57b32e",
+        stroke: "#1a1a1a", "stroke-width": 2
+      }));
+      svgText(g, pt[0], pt[1] + 5, "✊", {
+        "text-anchor": "middle", fill: "#fff", "font-size": 12
+      });
+    });
+  }
+
+  function drawPlayerUnrestMarkers(g, state) {
+    var x0 = 92, x1 = 1108, yB = 848;
+    state.players.forEach(function (p, idx) {
+      var px = x0 + Math.max(0, Math.min(100, p.unrest)) / 100 * (x1 - x0);
+      var py = yB + 20 + (idx % 2) * 12;
+      var mk = svgEl("g", { class: "unrest-marker" });
+      mk.appendChild(svgEl("circle", {
+        cx: px, cy: py, r: 9, fill: p.color,
+        stroke: "#fff", "stroke-width": 2
+      }));
+      mk.appendChild(svgEl("circle", {
+        cx: px, cy: py, r: 11.5, fill: "none",
+        stroke: "#1a1a1a", "stroke-width": 1.5
+      }));
+      var label = svgEl("title", {});
+      label.textContent = p.name + ": " + p.unrest;
+      mk.appendChild(label);
+      g.appendChild(mk);
+    });
+  }
+
   /* ---------- board ---------- */
 
   function renderBoard(svg, state) {
+    svg.setAttribute("viewBox", "0 0 " + BOARD.width + " " + BOARD.height);
     svg.textContent = "";
 
     var g = svgEl("g", {});
     svg.appendChild(g);
 
-    /* background */
-    g.appendChild(svgEl("rect", { x: 0, y: 0, width: 1160, height: 800, rx: 14, fill: "#23211a", stroke: "#000" }));
+    /* parchment base */
+    g.appendChild(svgEl("rect", {
+      x: 0, y: 0, width: BOARD.width, height: BOARD.height,
+      rx: 14, fill: "#e9ddaf", stroke: "#1a1a1a", "stroke-width": 3
+    }));
 
-    /* serpentine track path */
+    drawMeterBars(g);
+    drawCenter(g);
+
+    /* faint connector under the circles so the travel path reads */
     var d = [];
     BOARD.spaces.forEach(function (sp, i) {
-      var px = sp.x, py = sp.y;
-      if (i === 0) d.push("M" + px + "," + py);
-      else d.push("L" + px + "," + py);
+      if (i === 0) d.push("M" + sp.x + "," + sp.y);
+      else d.push("L" + sp.x + "," + sp.y);
     });
+    d.push("Z");
     g.appendChild(svgEl("path", {
-      d: d.join(" "), fill: "none", stroke: "#14130e", "stroke-width": 52,
-      "stroke-linecap": "round", "stroke-linejoin": "round", opacity: 0.9
-    }));
-    g.appendChild(svgEl("path", {
-      d: d.join(" "), fill: "none", stroke: "rgba(247,231,117,0.14)", "stroke-width": 1,
-      "stroke-dasharray": "4 6"
+      d: d.join(" "), fill: "none", stroke: "#8a7f5a",
+      "stroke-width": 5, "stroke-dasharray": "2 10",
+      "stroke-linecap": "round", opacity: 0.55
     }));
 
     var landedIdx = state.landed ? state.position : -1;
@@ -90,103 +283,171 @@ window.CU_UI = (function () {
       var isStart = (kind === "start");
       var isBlack = (kind === "black");
       var isLogo = (kind === "logo");
-      var fill = isStart ? "#16150f" : cat.color;
+      var r = sp.r || 40;
+      var fill = isStart ? "#b23727" : (isLogo ? "#e9ddaf" : cat.color);
 
       var c = svgEl("g", { class: "board-space" });
-      var rect = svgEl("rect", {
-        x: sp.x - SPACE_W / 2, y: sp.y - SPACE_H / 2,
-        width: SPACE_W, height: SPACE_H, rx: 10,
-        fill: fill, stroke: "rgba(255,255,255,0.4)", "stroke-width": 1.5
+      /* soft shadow for the overlapping-circle print look */
+      c.appendChild(svgEl("circle", {
+        cx: sp.x + 2, cy: sp.y + 3, r: r, fill: "#000", opacity: 0.18
+      }));
+      var circ = svgEl("circle", {
+        cx: sp.x, cy: sp.y, r: r, fill: fill,
+        stroke: "#1a1a1a", "stroke-width": 3
       });
       if (landedIdx === i) {
-        rect.setAttribute("stroke", "#fff");
-        rect.setAttribute("stroke-width", 4);
+        circ.setAttribute("stroke", "#ffffff");
+        circ.setAttribute("stroke-width", 5);
       }
-      c.appendChild(rect);
+      c.appendChild(circ);
+      var title = svgEl("title", {});
+      title.textContent = (isStart ? "START (relief)" : cat.name + (sp.value ? " " + (sp.value > 0 ? "+" : "") + sp.value : ""));
+      c.appendChild(title);
 
-      /* space center icon */
-      var icon = null;
-      if (isStart) icon = "START";
-      else if (isBlack) icon = "✊";
-      else if (isLogo) icon = "CU";
-      if (icon) {
-        c.appendChild(svgEl("text", {
-          x: sp.x, y: sp.y - 6, "text-anchor": "middle",
-          fill: "#fff", "font-size": isStart ? 20 : 22, "font-weight": 700,
-          "font-family": "Oswald, sans-serif", "letter-spacing": 1
-        })).textContent = icon;
+      if (isStart) {
+        svgText(c, sp.x, sp.y - 12, "START", {
+          "text-anchor": "middle", fill: "#fff",
+          "font-size": 22, "font-weight": 700, "font-family": "Oswald, sans-serif", "letter-spacing": 2
+        });
+        svgText(c, sp.x, sp.y + 26, "✊", {
+          "text-anchor": "middle", fill: "#e9ddaf", "font-size": 40
+        });
+        svgText(c, sp.x, sp.y + 46, "relief", {
+          "text-anchor": "middle", fill: "rgba(255,255,255,0.9)",
+          "font-size": 12, "font-style": "italic"
+        });
+      } else if (isBlack) {
+        svgText(c, sp.x, sp.y + 14, "✊", {
+          "text-anchor": "middle", fill: "#e9ddaf", "font-size": 42
+        });
+      } else if (isLogo) {
+        svgText(c, sp.x, sp.y + 14, "✊", {
+          "text-anchor": "middle", fill: "#1a1a1a", "font-size": 40
+        });
+        svgText(c, sp.x, sp.y + 30, "relief", {
+          "text-anchor": "middle", fill: "#1a1a1a", "font-size": 10, "font-style": "italic"
+        });
+      } else if (sp.value === 0) {
+        svgText(c, sp.x, sp.y + 10, "★", {
+          "text-anchor": "middle", fill: "#fff", "font-size": Math.round(r * 0.9)
+        });
       } else {
-        /* value + short name */
-        c.appendChild(svgEl("text", {
-          x: sp.x, y: sp.y + 6, "text-anchor": "middle",
-          fill: "#fff", "font-size": 34, "font-weight": 700
-        })).textContent = "+" + sp.value;
+        var fs = Math.round(r * (Math.abs(sp.value) >= 5 ? 0.85 : 0.95));
+        svgText(c, sp.x, sp.y + Math.round(fs * 0.36), (sp.value > 0 ? "+" : "") + sp.value, {
+          "text-anchor": "middle", fill: "#fff",
+          "font-size": fs, "font-weight": 800,
+          "font-family": "Oswald, Open Sans, sans-serif",
+          "stroke": "rgba(0,0,0,0.25)", "stroke-width": 0.5
+        });
       }
-      c.appendChild(svgEl("text", {
-        x: sp.x, y: sp.y + 28, "text-anchor": "middle",
-        fill: "rgba(255,255,255,0.92)", "font-size": 11, "font-weight": 600
-      })).textContent = (cat.short || kind).toUpperCase();
-
       g.appendChild(c);
     });
 
-    /* player tokens */
+    /* player tokens clustered on their space, like tabletop pawns */
     var counts = {};
     state.players.forEach(function (p) { counts[p.position] = (counts[p.position] || 0) + 1; });
     var placed = {};
     state.players.forEach(function (p) {
-      var n = counts[p.position] || 1;
-      var k = p.position;
-      placed[k] = (placed[k] || 0);
-      var slot = (placed[k] - (n - 1) / 2) * 16;
-      placed[k]++;
       var sp = BOARD.spaces[p.position];
       if (!sp) return;
-      var tx = sp.x + slot;
-      var ty = sp.y + 34 + 8;
-      var t = svgEl("g", { class: "board-token", "data-pidx": p.index });
-      var ring = svgEl("circle", {
-        cx: tx, cy: ty, r: 11,
-        fill: p.color, stroke: p.alive ? "#fff" : "#555",
-        "stroke-width": 2.5
-      });
-      t.appendChild(ring);
+      var n = counts[p.position] || 1;
+      placed[p.position] = placed[p.position] || 0;
+      var slot = placed[p.position]++;
+      var ang = n === 1 ? -Math.PI / 2 : (slot / n) * Math.PI * 2 - Math.PI / 2;
+      var rad = n === 1 ? 0 : Math.min(20, 8 + n * 2);
+      var tx = sp.x + Math.cos(ang) * rad;
+      var ty = sp.y + Math.sin(ang) * rad;
+      var t = svgEl("g", { class: "board-token" + (p.index === state.current ? " current" : ""), "data-pidx": p.index });
+      t.appendChild(svgEl("circle", {
+        cx: tx + 1.5, cy: ty + 2, r: 13, fill: "#000", opacity: 0.3
+      }));
+      t.appendChild(svgEl("circle", {
+        cx: tx, cy: ty, r: 13, fill: p.color,
+        stroke: "#1a1a1a", "stroke-width": 2.5
+      }));
+      t.appendChild(svgEl("circle", {
+        cx: tx, cy: ty, r: 10.5, fill: "none",
+        stroke: p.alive ? "#fff" : "#555", "stroke-width": 1.5
+      }));
       var letter = svgEl("text", {
-        x: tx, y: ty + 4, "text-anchor": "middle",
-        fill: "#fff", "font-size": 12, "font-weight": 700
+        x: tx, y: ty + 4.5, "text-anchor": "middle",
+        fill: "#fff", "font-size": 12, "font-weight": 800,
+        "font-family": "Oswald, sans-serif"
       });
       letter.textContent = p.name.charAt(0).toUpperCase();
       t.appendChild(letter);
+      var tip = svgEl("title", {});
+      tip.textContent = p.name + " (" + p.unrest + ")";
+      t.appendChild(tip);
       if (!p.alive) t.setAttribute("opacity", "0.35");
       g.appendChild(t);
     });
 
-    /* score pop: when a card is freshly drawn, the landed space's color box
-       and score lift off the board for ~1s, then settle back. */
+    drawPlayerUnrestMarkers(g, state);
+
+    /* score pop: when a card is freshly drawn, the landed circle lifts
+       off the board for ~1.5s, then settles back. */
     var landed = state.landed;
     if (landed && !landed.relief && landed.cards && landed.cards.length &&
         landed !== _lastLanded) {
       _lastLanded = landed;
-      var sp = BOARD.spaces[state.position];
-      if (sp) {
+      var lsp = BOARD.spaces[state.position];
+      if (lsp) {
         var pcat = CATS[landed.kind] || { color: "#444", name: "" };
-        var d = state.lastDelta ? state.lastDelta.amount : sp.value;
+        var delta = state.lastDelta ? state.lastDelta.amount : lsp.value;
         var pop = svgEl("g", { class: "score-pop" });
-        pop.appendChild(svgEl("rect", {
+        pop.appendChild(svgEl("circle", {
           class: "pop-rect",
-          x: sp.x - SPACE_W / 2, y: sp.y - SPACE_H / 2,
-          width: SPACE_W, height: SPACE_H, rx: 10,
-          fill: pcat.color, stroke: "#fff", "stroke-width": 3
+          cx: lsp.x, cy: lsp.y, r: (lsp.r || 40) + 4,
+          fill: pcat.color, stroke: "#fff", "stroke-width": 4
         }));
         var pt = svgEl("text", {
-          x: sp.x, y: sp.y + 8, "text-anchor": "middle",
-          fill: "#fff", "font-size": 42, "font-weight": 800
+          x: lsp.x, y: lsp.y + 15, "text-anchor": "middle",
+          fill: "#fff", "font-size": 44, "font-weight": 800
         });
-        pt.textContent = (d > 0 ? "+" : "") + d;
+        pt.textContent = (delta > 0 ? "+" : "") + delta;
         pop.appendChild(pt);
         g.appendChild(pop);
       }
     }
+  }
+
+  /* Hop a pawn space-by-space from `fromIdx` to `toIdx` without mutating
+     game state, so movement reads like a tabletop piece travelling the rim.
+     Calls done() when the hop finishes. */
+  function animateHop(svg, state, pIdx, fromIdx, toIdx, done) {
+    var len = BOARD.trackLength;
+    var steps = (toIdx - fromIdx + len) % len;
+    if (!steps) { if (done) done(); return; }
+    var player = state.players[pIdx];
+    var i = 0;
+    function hop() {
+      renderBoard(svg, state);
+      var root = svg.querySelector("g");
+      var idx = (fromIdx + i) % len;
+      var sp = BOARD.spaces[idx];
+      if (root && sp) {
+        var ghost = svgEl("g", { class: "board-token hopping" });
+        ghost.appendChild(svgEl("circle", {
+          cx: sp.x, cy: sp.y - sp.r - 16, r: 14, fill: player.color,
+          stroke: "#fff", "stroke-width": 3
+        }));
+        var txt = svgEl("text", {
+          x: sp.x, y: sp.y - sp.r - 11, "text-anchor": "middle",
+          fill: "#fff", "font-size": 13, "font-weight": 800
+        });
+        txt.textContent = player.name.charAt(0).toUpperCase();
+        ghost.appendChild(txt);
+        root.appendChild(ghost);
+      }
+      i++;
+      if (i <= steps) {
+        setTimeout(hop, 175);
+      } else {
+        setTimeout(function () { if (done) done(); }, 240);
+      }
+    }
+    hop();
   }
 
   /* ---------- panels ---------- */
@@ -350,6 +611,7 @@ window.CU_UI = (function () {
 
   return {
     renderBoard: renderBoard,
+    animateHop: animateHop,
     renderTurnControls: renderTurnControls,
     attachTurnPanel: attachTurnPanel,
     renderPlayers: renderPlayers,

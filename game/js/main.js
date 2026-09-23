@@ -21,6 +21,9 @@
   var TURN_HOLD = 1500;
   var AI_STEP = 900;
 
+  /* True while a pawn is hopping space-by-space so Move can't double-fire. */
+  var isAnimating = false;
+
   var PLAYER_COLORS = ["#e74c3c", "#2e86c1", "#27ae60", "#f39c12", "#8e44ad", "#16a085"];
 
   /* ---------------- setup screen ---------------- */
@@ -124,11 +127,27 @@
 
   /* ---------------- driver ---------------- */
 
+  function animatedMove(pIdx) {
+    var p = state.players[pIdx];
+    var from = p.position;
+    var len = window.CU_BOARD.trackLength;
+    var to = (from + (state.lastRoll || 0)) % len;
+    if (isAnimating) return;
+    isAnimating = true;
+    var btn = turnPanel.querySelector(".turn-actions .btn");
+    if (btn) btn.disabled = true;
+    UI.animateHop(boardSvg, state, pIdx, from, to, function () {
+      isAnimating = false;
+      E.move(state);
+      pump();
+    });
+  }
+
   function render() {
     UI.renderBoard(boardSvg, state);
     var controls = UI.renderTurnControls(state, {
       onRoll: function () { E.rollDice(state); pump(); },
-      onMove: function () { E.move(state); pump(); },
+      onMove: function () { animatedMove(state.current); },
       onResolve: function () { E.resolveLanding(state); pump(); },
       onPlayHeld: function (i) { E.playHeld(state, i); pump(); }
     });
@@ -175,7 +194,7 @@
       /* rotation pause: show whose turn it is before the AI rolls */
       setTimeout(function () { AI.aiTurn(state, cur.index); pump(); }, TURN_HOLD);
     } else if (state.phase === "rolled") {
-      setTimeout(function () { E.move(state); pump(); }, AI_STEP);
+      setTimeout(function () { if (!isAnimating) animatedMove(cur.index); }, AI_STEP);
     } else if (state.phase === "landed") {
       setTimeout(function () { E.resolveLanding(state); pump(); }, AI_STEP);
     }

@@ -1,28 +1,26 @@
 /* Board layout for the digital Civil Unrest board.
- * The track is a winding ("zig-zag") path of 36 spaces around the board plus
- * the START space.  Space colors follow the physical game: the six crisis
- * categories, red Reform spaces, Civil Unrest logo relief spaces and (America
- * expansion) black "fist" spaces. */
+ * Matches the physical "Civil Unrest.png" / Civil_Unrest_Board_Final.svg:
+ * a perimeter loop of overlapping circles around a parchment center with
+ * the CIVIL UNREST fist emblem + six category legend boxes, wrapped by a
+ * 0-100 unrest meter on the outer edge.
+ * Logical order is preserved: START (0) then 36 spaces clockwise:
+ * bottom row L->R, right column B->T, top row R->L, left column T->B. */
 window.CU_BOARD = (function () {
   "use strict";
 
   var CATEGORIES = {
     green:  { name: "Economic Pressure",            short: "ECON",   color: "#7ab490", deck: true },
-    yellow: { name: "Natural Disasters & Climate",  short: "NATURE", color: "#f0e06a", deck: true },
-    blue:   { name: "Civil Discord & Identity",     short: "DISCORD",color: "#5690a3", deck: true },
-    purple: { name: "Global Influence & Interference", short: "GLOBAL", color: "#800080", deck: true },
-    orange: { name: "Demographics & Immigration",   short: "PEOPLE", color: "#f7a541", deck: true },
-    red:    { name: "Reform & Resource Tokens",     short: "REFORM", color: "#b73a28", deck: true },
+    yellow: { name: "Natural Disasters & Climate",  short: "NATURE", color: "#efe16e", deck: true },
+    blue:   { name: "Civil Discord & Identity",     short: "DISCORD",color: "#5b93a5", deck: true },
+    purple: { name: "Global Influence & Interference", short: "GLOBAL", color: "#7f1f7f", deck: true },
+    orange: { name: "Demographics & Immigration",   short: "PEOPLE", color: "#f5a742", deck: true },
+    red:    { name: "Reform & Resource Tokens",     short: "REFORM", color: "#b23727", deck: true },
     black:  { name: "Civil Unrest",                 short: "FIST",   color: "#16150f", deck: true },
-    logo:   { name: "Civil Unrest",                 short: "LOGO",   color: "#2c2a20", deck: false },
-    start:  { name: "START",                        short: "START",  color: "#16150f", deck: false }
+    logo:   { name: "Civil Unrest",                 short: "LOGO",   color: "#e9ddaf", deck: false },
+    start:  { name: "START",                        short: "START",  color: "#b23727", deck: false }
   };
 
-  /* Layout: 9 columns x 4 rows, serpentine (zig-zag). Index 0 = START at the
-   * bottom-left; the path runs up the left edge and snakes left-right. */
-  var cols = [60, 185, 310, 435, 560, 685, 810, 935, 1060];
-  var rows = [160, 300, 440, 580];
-
+  /* Same logical deck order as before — only the geometry changed. */
   var grid = [
     ["green", 2], ["blue", 1], ["logo", 0], ["orange", 3], ["purple", 2],
     ["yellow", 4], ["green", 3], ["blue", 2], ["fist", 0],
@@ -34,30 +32,63 @@ window.CU_BOARD = (function () {
     ["green", 1], ["purple", 5], ["red", 0], ["yellow", 5]
   ];
 
-  function rowDir(r) { return (r % 2 === 0) ? 1 : -1; }  // row 0 -> L->R
+  var W = 1200, H = 900;
+
+  /* Track rectangle (centers) inside the outer unrest meter. */
+  var LEFT = 165, RIGHT = 1035, TOP = 150, BOTTOM = 740;
+
+  function radiusFor(kind, value) {
+    if (kind === "start") return 74;
+    if (kind === "black") return 60;
+    if (kind === "logo") return 56;
+    /* Physical board: bigger numbers = bigger circles. */
+    return 34 + Math.max(0, value) * 3.2;
+  }
+
+  /* Perimeter position for track slot t = 1..36. */
+  function perimeterPos(t) {
+    var f, x, y;
+    if (t >= 1 && t <= 9) {           /* bottom row, L -> R */
+      f = (t - 1) / 8;
+      x = 280 + f * (920 - 280);
+      y = BOTTOM + ((t % 2) ? -9 : 9);
+    } else if (t >= 10 && t <= 18) {  /* right column, B -> T */
+      f = (t - 10) / 8;
+      y = 650 - f * (650 - 230);
+      x = RIGHT + ((t % 2) ? 8 : -8);
+    } else if (t >= 19 && t <= 27) {  /* top row, R -> L */
+      f = (t - 19) / 8;
+      x = 920 - f * (920 - 280);
+      y = TOP + ((t % 2) ? 9 : -9);
+    } else {                          /* left column, T -> B */
+      f = (t - 28) / 8;
+      y = 240 + f * (640 - 240);
+      x = LEFT + ((t % 2) ? -8 : 8);
+    }
+    return { x: Math.round(x), y: Math.round(y) };
+  }
 
   var spaces = [];
-  var start = { i: 0, kind: "start", x: cols[0], y: 700, value: 0, label: "START" };
-  spaces.push(start);
+  spaces.push({ i: 0, kind: "start", x: 165, y: 740, r: radiusFor("start", 0), value: 0, label: "START" });
 
   grid.forEach(function (cell, idx) {
-    var r = Math.floor(idx / 9);
-    var c = idx % 9;
-    var x = (rowDir(r) === 1) ? cols[c] : cols[8 - c];
+    var t = idx + 1;
+    var pos = perimeterPos(t);
     var kind = cell[0] === "fist" ? "black" : cell[0];
     spaces.push({
-      i: idx + 1,
+      i: t,
       kind: kind,
-      x: x,
-      y: rows[r],
+      x: pos.x,
+      y: pos.y,
+      r: radiusFor(kind, cell[1]),
       value: cell[1],
       label: CATEGORIES[kind].name
     });
   });
 
   return {
-    width: 1160,
-    height: 780,
+    width: W,
+    height: H,
     startIndex: 0,
     trackLength: spaces.length,     // 37 (START + 36 spaces)
     spaces: spaces,
