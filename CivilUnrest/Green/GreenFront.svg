@@ -7,9 +7,9 @@
    viewBox="0 0 89 89"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="GreenFront.svg"
-   inkscape:export-filename="Green.png"
+   inkscape:export-filename="GreenFront.png"
    inkscape:export-xdpi="321.06741"
    inkscape:export-ydpi="321.06741"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -27,10 +27,10 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="2.5200965"
-     inkscape:cx="162.89059"
+     inkscape:cx="163.08899"
      inkscape:cy="146.42296"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
+     inkscape:window-width="1536"
+     inkscape:window-height="891"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -113,7 +113,7 @@
        cy="37.335327"
        fill="#b73a28"
        id="circle1"
-       style="fill:#7ab490;fill-opacity:1;stroke:#000000;stroke-width:0.765304;stroke-linecap:butt;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       style="fill:#4cca7f;fill-opacity:1;stroke:#000000;stroke-width:0.765304;stroke-linecap:butt;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        r="14.870667" />
     <path
        inkscape:connector-curvature="0"
@@ -163,8 +163,8 @@
        class="label"
        font-size="48px"
        id="text1"
-       style="font-size:9.16513px;fill:#7ab490;fill-opacity:1;stroke-width:0.122749"><tspan
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.16513px;font-family:SUSE;-inkscape-font-specification:'SUSE Bold';fill:#7ab490;fill-opacity:1;stroke-width:0.122749"
+       style="font-size:9.16513px;fill:#4cca7f;fill-opacity:1;stroke-width:0.122749"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.16513px;font-family:SUSE;-inkscape-font-specification:'SUSE Bold';fill:#4cca7f;fill-opacity:1;stroke-width:0.122749"
          id="tspan25">CIVIL UNREST</tspan></text>
   </g>
 </svg>

@@ -74,6 +74,27 @@ window.CU_AI = (function () {
       return;
     }
 
+    /* +→ special spaces: buy / award decisions. */
+    if (state.phase === "arrow" && state.pending) {
+      var ap = state.pending;
+      var aw = ap.player;
+      if (!state.players[aw] || !state.players[aw].isAI) return;
+      if (ap.type === "arrowBuy") {
+        var ame = state.players[aw];
+        var aTarget = highestUnrestOpponent(state, aw);
+        var nearCollapse = aTarget != null && state.players[aTarget].unrest >= 88;
+        var safe = ame.unrest + 10 < 95;
+        E.arrowBuy(state, nearCollapse && safe);
+        return;
+      }
+      if (ap.type === "arrowAward") {
+        var aT = highestUnrestOpponent(state, aw);
+        if (aT == null) E.arrowSkipAward(state);
+        else E.arrowAward(state, aT);
+        return;
+      }
+    }
+
     /* Target choices for purple sabotage / relief cards — decider may not be current. */
     if (state.phase === "target" && state.pending &&
         (state.pending.type === "target" || state.pending.type === "transferTarget")) {

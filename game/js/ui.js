@@ -301,7 +301,9 @@ window.CU_UI = (function () {
       }
       c.appendChild(circ);
       var title = svgEl("title", {});
-      title.textContent = (isStart ? "START (relief)" : cat.name + (sp.value ? " " + (sp.value > 0 ? "+" : "") + sp.value : ""));
+      title.textContent = (isStart ? "START (relief)"
+        : sp.arrow ? cat.name + " (+→)"
+        : cat.name + (sp.value ? " " + (sp.value > 0 ? "+" : "") + sp.value : ""));
       c.appendChild(title);
 
       if (isStart) {
@@ -327,6 +329,32 @@ window.CU_UI = (function () {
         svgText(c, sp.x, sp.y + 30, "relief", {
           "text-anchor": "middle", fill: "#1a1a1a", "font-size": 10, "font-style": "italic"
         });
+      } else if (sp.arrow) {
+        var as = state.arrows && state.arrows[i];
+        var afs = Math.round(r * 0.72);
+        svgText(c, sp.x, sp.y + Math.round(afs * 0.35), "+→", {
+          "text-anchor": "middle", fill: "#fff",
+          "font-size": afs, "font-weight": 800,
+          "font-family": "Oswald, Open Sans, sans-serif",
+          "stroke": "rgba(0,0,0,0.3)", "stroke-width": 0.6
+        });
+        if (as && as.owned && as.owner != null && state.players[as.owner]) {
+          var oc = state.players[as.owner].color;
+          c.appendChild(svgEl("circle", {
+            cx: sp.x, cy: sp.y, r: r + 4, fill: "none",
+            stroke: oc, "stroke-width": 4
+          }));
+          var br = Math.round(r * 0.36);
+          c.appendChild(svgEl("circle", {
+            cx: sp.x + r * 0.72, cy: sp.y - r * 0.72, r: br, fill: oc,
+            stroke: "#1a1a1a", "stroke-width": 2
+          }));
+          svgText(c, sp.x + r * 0.72, sp.y - r * 0.72 + br * 0.35,
+            state.players[as.owner].name.charAt(0).toUpperCase(), {
+              "text-anchor": "middle", fill: "#fff", "font-size": Math.round(br * 1.1),
+              "font-weight": 800, "font-family": "Oswald, sans-serif"
+            });
+        }
       } else if (sp.value === 0) {
         svgText(c, sp.x, sp.y + 10, "★", {
           "text-anchor": "middle", fill: "#fff", "font-size": Math.round(r * 0.9)
@@ -486,7 +514,9 @@ window.CU_UI = (function () {
       move.onclick = handlers.onMove;
       actions.appendChild(move);
     } else if (state.phase === "landed" && !cur.isAI) {
-      var res = el("button", "btn btn-primary", "Draw Card");
+      var isSpecial = window.CU_BOARD.isArrow(state.position) ||
+        state.landed && state.landed.relief;
+      var res = el("button", "btn btn-primary", isSpecial ? "Continue" : "Draw Card");
       res.onclick = handlers.onResolve;
       actions.appendChild(res);
     } else if (cur.isAI) {
@@ -549,7 +579,9 @@ window.CU_UI = (function () {
     headRow.appendChild(el("h3", "", "Event"));
     var landed = state.landed;
     if (!landed || !landed.cards || !landed.cards.length) {
-      headRow.appendChild(el("p", "card-none", "Land on a space to draw an event card."));
+      var none = "Land on a space to draw an event card.";
+      if (landed && landed.arrow != null) none = "+→ space — resolve the purchase / award.";
+      headRow.appendChild(el("p", "card-none", none));
       area.appendChild(headRow);
       return;
     }

@@ -7,7 +7,7 @@
    viewBox="0 0 89 89"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="Purple Card 14.svg"
    inkscape:export-filename="Purple Card 14.png"
    inkscape:export-xdpi="321.06741"
@@ -28,14 +28,14 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="1.2436638"
-     inkscape:cx="131.06436"
+     inkscape:cx="131.4664"
      inkscape:cy="77.995355"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
+     inkscape:window-width="1536"
+     inkscape:window-height="891"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showguides="true">
     <sodipodi:guide
        position="44.97961,95.054946"
@@ -133,6 +133,11 @@
          style="stroke-width:3"
          x="45.011883"
          y="45.222046"
-         id="tspan2">(Use Card Value)</tspan></text>
+         id="tspan4">(Give another player</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:3"
+         x="45.011883"
+         y="51.395668"
+         id="tspan5">the circle points +2 more)</tspan></text>
   </g>
 </svg>

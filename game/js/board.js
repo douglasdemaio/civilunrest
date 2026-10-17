@@ -32,6 +32,12 @@ window.CU_BOARD = (function () {
     ["green", 1], ["purple", 5], ["red", 0], ["yellow", 5]
   ];
 
+  /* One "+→" space per color (green, yellow, blue, purple, orange, red).
+   * On the physical board these are the six spaces whose point value was
+   * replaced by a "+→" glyph; here they sit on the closest same-color slot.
+   * They drive the +→ purchase / award rule. */
+  var ARROW_INDICES = { 3: true, 14: true, 19: true, 25: true, 34: true, 35: true };
+
   var W = 1200, H = 900;
 
   /* Track rectangle (centers) inside the outer unrest meter. */
@@ -82,6 +88,7 @@ window.CU_BOARD = (function () {
       y: pos.y,
       r: radiusFor(kind, cell[1]),
       value: cell[1],
+      arrow: !!ARROW_INDICES[idx],
       label: CATEGORIES[kind].name
     });
   });
@@ -95,6 +102,10 @@ window.CU_BOARD = (function () {
     categories: CATEGORIES,
     kindOf: function (i) { return spaces[i].kind; },
     valueOf: function (i) { return spaces[i].value; },
+    isArrow: function (i) { return !!(spaces[i] && spaces[i].arrow); },
+    arrowIndices: function () {
+      return spaces.filter(function (s) { return s.arrow; }).map(function (s) { return s.i; });
+    },
     isDeckSpace: function (i) {
       var k = spaces[i].kind;
       return !!CATEGORIES[k].deck;

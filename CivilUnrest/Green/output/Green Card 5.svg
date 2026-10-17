@@ -7,7 +7,7 @@
    viewBox="0 0 89 89"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="Green Card 5.svg"
    inkscape:export-filename="Green Card 5.png"
    inkscape:export-xdpi="321.06741"
@@ -27,10 +27,10 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="2.5200965"
-     inkscape:cx="142.85167"
-     inkscape:cy="165.46985"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
+     inkscape:cx="-51.386921"
+     inkscape:cy="40.871451"
+     inkscape:window-width="1536"
+     inkscape:window-height="891"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -125,8 +125,13 @@
          id="tspan3">for currency reform.</tspan><tspan
          sodipodi:role="line"
          style="stroke-width:3"
-         x="45.51083"
+         x="44.935448"
          y="44.369003"
-         id="tspan2">(Use Card Value)  </tspan></text>
+         id="tspan2">(Give another player</tspan><tspan
+         sodipodi:role="line"
+         style="stroke-width:3"
+         x="45.51083"
+         y="50.542625"
+         id="tspan4">the circle points +2 more)  </tspan></text>
   </g>
 </svg>

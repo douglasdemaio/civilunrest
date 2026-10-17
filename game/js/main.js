@@ -186,6 +186,14 @@
       showTargetChoice(state.pending);
       return;
     }
+    if (state.phase === "arrow") {
+      var decider = state.pending && state.pending.player;
+      if (decider != null && state.players[decider].isAI) { AI.aiTurn(state, decider); pump(); return; }
+      if (!state.pending) { pump(); return; }
+      if (state.pending.type === "arrowBuy") showArrowBuy(state.pending);
+      else if (state.pending.type === "arrowAward") showArrowAward(state.pending);
+      return;
+    }
 
     var cur = state.players[state.current];
     if (!cur.isAI) return;
@@ -285,6 +293,58 @@
 
   function fmt(n) { return (n >= 0 ? "+" : "") + n; }
 
+  /* ---- +→ special spaces ---- */
+
+  function showArrowBuy(pending) {
+    var sp = window.CU_BOARD.spaces[pending.space];
+    var cat = window.CU_CARDS.categories[sp.kind] || { name: sp.kind, color: "#888" };
+    var html = "<h2>+→ Space — " + escapeHtml(cat.name) + "</h2>" +
+      "<p>The first player to land on a +→ space may <b>purchase</b> it.</p>" +
+      "<ul class=\"target-list\">" +
+      "<li class=\"target-item\"><b>Purchase</b> — you gain <b>+10</b> unrest, then choose another player to award <b>+5</b> unrest.</li>" +
+      "<li class=\"target-item\"><b>Decline</b> — the space stays open; every later player who lands may award <b>+2</b> unrest.</li>" +
+      "</ul>" +
+      '<div class="modal-actions">' +
+      '<button class="btn btn-primary" id="m-buy">Purchase (+10, then award +5)</button>' +
+      '<button class="btn" id="m-decline">Decline</button></div>';
+    UI.openModal(html);
+    document.getElementById("m-buy").onclick = function () {
+      UI.closeModal(); E.arrowBuy(state, true); pump();
+    };
+    document.getElementById("m-decline").onclick = function () {
+      UI.closeModal(); E.arrowBuy(state, false); pump();
+    };
+  }
+
+  function showArrowAward(pending) {
+    var amount = pending.amount;
+    var legal = [];
+    state.players.forEach(function (p) {
+      if (p.alive && p.index !== pending.player) legal.push(p.index);
+    });
+    var list = legal.map(function (i) {
+      var p = state.players[i];
+      return '<li class="target-item" data-i="' + i + '"><span class="dot" style="background:' + p.color + '"></span>' +
+        escapeHtml(p.name) + " — " + p.unrest + " unrest</li>";
+    }).join("");
+    UI.openModal(
+      "<h2>Award Unrest</h2>" +
+      "<p>" + escapeHtml(state.players[pending.player].name) + " may award <b>+" + amount +
+      "</b> unrest to another player (or pass):</p><ul class=\"target-list\">" + list + "</ul>" +
+      '<div class="modal-actions"><button class="btn" id="m-pass">Pass</button></div>'
+    );
+    document.querySelectorAll(".target-item").forEach(function (li) {
+      li.onclick = function () {
+        UI.closeModal();
+        E.arrowAward(state, parseInt(li.dataset.i, 10));
+        pump();
+      };
+    });
+    document.getElementById("m-pass").onclick = function () {
+      UI.closeModal(); E.arrowSkipAward(state); pump();
+    };
+  }
+
   function showDiscardChoice(pIdx) {
     var p = state.players[pIdx];
     var list = p.heldCards.map(function (hc, i) {
@@ -371,8 +431,9 @@
       "<li><b>Turn:</b> roll the die, move forward on the board, land on a colored space and draw its event card.</li>" +
       "<li><b>Points:</b> apply the space value and the card instruction (add, subtract, multiply, or use card value). Unrest can't go below 0.</li>" +
       "<li><b>Green</b> Economic · <b>Yellow</b> Natural Disasters · <b>Blue</b> Civil Discord · <b>Purple</b> Global Interference · <b>Orange</b> Demographics · <b>Red</b> Reform.</li>" +
-      "<li><b>Red reform cards</b> reduce unrest; some may be held and played on later turns.</li>" +
-      "<li><b>Logo relief spaces</b> cause no events. Fist spaces activate the America expansion deck.</li>" +
+        "<li><b>Red reform cards</b> reduce unrest; some may be held and played on later turns.</li>" +
+        "<li><b>+→ spaces</b> (one per color): the first to land may purchase for +10 unrest, then award +5 to another; if declined, later landers may award +2.</li>" +
+        "<li><b>Logo relief spaces</b> cause no events. Fist spaces activate the America expansion deck.</li>" +
       "<li><b>Collapse:</b> reach 100 unrest and you're eliminated.</li>" +
       "<li><b>Optional:</b> Reform Victory, Tyrant Victory, Crisis Mode, Two Dice Economy, America expansion.</li>" +
       "</ul>" +

@@ -7,7 +7,7 @@
    viewBox="0 0 89 89"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="Green Card 1.svg"
    inkscape:export-filename="Green Card 1.png"
    inkscape:export-xdpi="321.06741"
@@ -27,15 +27,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="2.5200965"
-     inkscape:cx="171.0252"
-     inkscape:cy="169.43796"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
+     inkscape:zoom="1.2600483"
+     inkscape:cx="243.24464"
+     inkscape:cy="126.18564"
+     inkscape:window-width="1536"
+     inkscape:window-height="891"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer1"
      showguides="true">
     <sodipodi:guide
        position="45.001476,73.005935"
@@ -138,11 +138,14 @@
          y="38.615337"
          id="tspan8">worsening shortages.</tspan><tspan
          sodipodi:role="line"
-         style="writing-mode:lr-tb;stroke-width:3"
-         x="46.902252"
+         style="text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:3"
+         x="46.32687"
          y="44.788963"
-         id="tspan11"><tspan
-   style="text-align:center;writing-mode:lr-tb;text-anchor:middle"
-   id="tspan12">(Use Card Value)</tspan>         </tspan></text>
+         id="tspan3">(Take circle points and</tspan><tspan
+         sodipodi:role="line"
+         style="text-align:center;writing-mode:lr-tb;text-anchor:middle;stroke-width:3"
+         x="46.32687"
+         y="50.962585"
+         id="tspan5">give another player +3)</tspan></text>
   </g>
 </svg>

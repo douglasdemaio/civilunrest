@@ -355,6 +355,11 @@ window.CU_Engine = (function () {
        event strip can show the true change once the turn has rotated on. */
     state.lastDelta = null;
 
+    /* +→ special space: purchase / award rule instead of a normal card. */
+    if (BOARD.isArrow(state.position)) {
+      return resolveArrowLanding(state, pIdx);
+    }
+
     if (kind === "start" || kind === "logo") {
       pushLog(state, p.name + " lands on a relief space — no card drawn.");
       state.landed = { kind: kind, relief: true, cards: [] };
@@ -400,6 +405,86 @@ window.CU_Engine = (function () {
     if (state.phase === "gameover") return;
     if (state.pending) return; /* hold / target / choice / discards set by applyCard */
     nextCardInFlight(state, pIdx);
+  }
+
+  /* ---- +→ special spaces ----
+   * Each color has one +→ space. The first player to land on it may purchase
+   * it: they gain 10 unrest themselves and then may award another player 5
+   * unrest (the buyer "gains points" but hopes the handout hurts a rival).
+   * If they decline, the space stays open and every later player who lands on
+   * it may award another player 2 unrest. Once purchased the space is locked. */
+  function resolveArrowLanding(state, pIdx) {
+    var pos = state.position;
+    var sp = BOARD.spaces[pos];
+    var a = state.arrows[pos];
+    state.landed = { kind: sp.kind, relief: true, cards: [], arrow: pos };
+
+    if (!a.decided) {
+      state.pending = { type: "arrowBuy", player: pIdx, space: pos };
+      state.phase = "arrow";
+      return;
+    }
+    if (!a.owned) {
+      /* left open by the first player: this lander may hand out 2 unrest */
+      state.pending = { type: "arrowAward", player: pIdx, space: pos, amount: 2 };
+      state.phase = "arrow";
+      return;
+    }
+    /* purchased earlier — the space is locked and has no further effect */
+    state.pending = null;
+    state.phase = "turn";
+    afterTurn(state, pIdx);
+  }
+
+  function arrowBuy(state, buy) {
+    var pend = state.pending;
+    if (!pend || pend.type !== "arrowBuy") return;
+    var pIdx = pend.player;
+    var p = playerByIdx(state, pIdx);
+    var a = state.arrows[pend.space];
+
+    if (buy) {
+      a.decided = true; a.owned = true; a.open = false; a.owner = pIdx;
+      addUnrest(state, pIdx, 10);
+      pushLog(state, p.name + " purchases the +→ space for 10 unrest.");
+      afterCollapseCheck(state, pIdx);
+      if (state.phase === "gameover") return;
+      /* now choose a rival to hand 5 unrest to */
+      state.pending = { type: "arrowAward", player: pIdx, space: pend.space, amount: 5 };
+      state.phase = "arrow";
+      return;
+    }
+
+    a.decided = true; a.open = true; a.owned = false;
+    pushLog(state, p.name + " declines the +→ purchase — the space stays open.");
+    state.pending = null;
+    state.phase = "turn";
+    afterTurn(state, pIdx);
+  }
+
+  /* Award unrest to a chosen player (amount set by the pending award), or skip. */
+  function arrowAward(state, targetIdx) {
+    var pend = state.pending;
+    if (!pend || pend.type !== "arrowAward") return;
+    var amount = pend.amount;
+    var from = pend.player;
+    if (targetIdx != null && targetIdx !== from) {
+      addUnrest(state, targetIdx, amount);
+      pushLog(state, playerByIdx(state, from).name + " awards +" + amount +
+        " unrest to " + playerByIdx(state, targetIdx).name + ".");
+      afterCollapseCheck(state, targetIdx);
+      if (state.phase === "gameover") return;
+    }
+    state.pending = null;
+    state.phase = "turn";
+    afterTurn(state, from);
+  }
+
+  function arrowSkipAward(state) {
+    var pend = state.pending;
+    if (!pend || pend.type !== "arrowAward") return;
+    pushLog(state, playerByIdx(state, pend.player).name + " passes on awarding unrest.");
+    arrowAward(state, null);
   }
 
   function finishLanding(state, pIdx) {
@@ -516,8 +601,14 @@ window.CU_Engine = (function () {
       dice: [],
       position: 0,
       crisisCursor: 0,
+      arrows: {},
       winner: null
     };
+
+    /* +→ spaces: one per color, each tracked independently as the board laps. */
+    BOARD.arrowIndices().forEach(function (i) {
+      state.arrows[i] = { decided: false, open: false, owned: false, owner: null };
+    });
 
     cfg.players.forEach(function (slot, i) {
       state.players.push({
@@ -623,6 +714,9 @@ window.CU_Engine = (function () {
     resolveDiscard: resolveDiscard,
     nextPlayerForDiscard: nextPlayerForDiscard,
     resolveTransfer: pickTransferTarget,
+    arrowBuy: arrowBuy,
+    arrowAward: arrowAward,
+    arrowSkipAward: arrowSkipAward,
     holdNow: holdNow,
     holdForLater: holdForLater,
     playHeld: playHeld,

@@ -7,7 +7,7 @@
    viewBox="0 0 89 89"
    version="1.1"
    id="svg1"
-   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
    sodipodi:docname="Purple Card 10.svg"
    inkscape:export-filename="Purple Card 10.png"
    inkscape:export-xdpi="321.06741"
@@ -28,9 +28,9 @@
      inkscape:document-units="mm"
      inkscape:zoom="1.2436638"
      inkscape:cx="121.81749"
-     inkscape:cy="192.9782"
-     inkscape:window-width="1920"
-     inkscape:window-height="1131"
+     inkscape:cy="193.78227"
+     inkscape:window-width="1536"
+     inkscape:window-height="891"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -186,11 +186,11 @@
          style="stroke-width:3"
          x="45.011883"
          y="39.04842"
-         id="tspan2"> (Transfer your next Purple </tspan><tspan
+         id="tspan3"> (Give another player</tspan><tspan
          sodipodi:role="line"
          style="stroke-width:3"
          x="45.011883"
          y="45.222046"
-         id="tspan3">card effect to another player)</tspan></text>
+         id="tspan2">the circle points +3 more)</tspan></text>
   </g>
 </svg>
