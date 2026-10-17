@@ -8,11 +8,19 @@ window.CU_Engine = (function () {
   var BOARD = window.CU_BOARD;
   var CARDS = window.CU_CARDS;
   var AMERICA = window.CU_AMERICA;
+  var BANANA = window.CU_BANANA;
 
   var COLLAPSE = 100;
 
   var PLAYER_COLORS = ["#e74c3c", "#2e86c1", "#27ae60", "#f39c12", "#8e44ad", "#16a085"];
   var DECK_KEYS = ["green", "yellow", "blue", "purple", "orange", "red"];
+
+  /* Banana Republic is a standalone deck: when enabled, every colored event
+   * space draws from the single Banana deck instead of its base color deck. */
+  function deckKeyFor(kind, cfg) {
+    if (cfg && cfg.banana && DECK_KEYS.indexOf(kind) >= 0) return "banana";
+    return kind;
+  }
 
   function shuffle(a) {
     var arr = a.slice();
@@ -36,6 +44,9 @@ window.CU_Engine = (function () {
     if (cfg.america) {
       decks.black = { draw: shuffle(AMERICA.black), discard: [] };
     }
+    if (cfg.banana && BANANA && BANANA.deck && BANANA.deck.length) {
+      decks.banana = { draw: shuffle(BANANA.deck), discard: [] };
+    }
     return decks;
   }
 
@@ -49,7 +60,20 @@ window.CU_Engine = (function () {
     }
     if (!deck.draw.length) return null;
     var card = deck.draw.pop();
+    /* Remember which deck this card came from so a spent card can be
+       returned to that deck's discard pile. */
+    card._deckKey = key;
     return card;
+  }
+
+  /* A card is "spent" once it has resolved (or been discarded). Spent cards
+   * go to their deck's discard pile so the deck reshuffles instead of running
+   * dry — critical for the Banana Republic expansion, whose single deck is
+   * drawn on every colored space. */
+  function spendCard(state, card) {
+    if (!card || !card._deckKey) return;
+    var deck = state.decks[card._deckKey];
+    if (deck) deck.discard.push(card);
   }
 
   function pushLog(state, text) {
@@ -99,8 +123,29 @@ window.CU_Engine = (function () {
 
   /* ---- card effect application ---- */
 
-  function applyTargeted(state, from, self, effect) {
+  function applyTargeted(state, from, self, effect, spaceValue) {
     var actions = effect.action;
+    spaceValue = spaceValue || 0;
+    if (actions === "allPlayers") {
+      var val = effect.val;
+      state.players.forEach(function (p) {
+        if (p.alive) addUnrest(state, p.index, val);
+      });
+      pushLog(state, "All players gain " + (val >= 0 ? "+" : "") + val + " unrest.");
+      return;
+    }
+    if (actions === "giveCirclePlus") {
+      state.pending = { type: "target", from: from, self: self,
+        kind: "giveCirclePlus", effect: effect, spv: spaceValue, card: null };
+      state.phase = "target";
+      return;
+    }
+    if (actions === "takeCircleGive") {
+      state.pending = { type: "target", from: from, self: self,
+        kind: "takeCircleGive", effect: effect, spv: spaceValue, card: null };
+      state.phase = "target";
+      return;
+    }
     if (actions === "allOthers") {
       var val = effect.val;
       state.players.forEach(function (p) {
@@ -180,7 +225,7 @@ window.CU_Engine = (function () {
     }
 
     if (card.type === "targeted") {
-      applyTargeted(state, pIdx, self, card.effect);
+      applyTargeted(state, pIdx, self, card.effect, spv);
       return;
     }
 
@@ -291,8 +336,25 @@ window.CU_Engine = (function () {
       addUnrest(state, targetIdx, effect.target);
       afterCollapseCheck(state, self);
       afterCollapseCheck(state, targetIdx);
+    } else if (pending.kind === "giveCirclePlus") {
+      var gain = (pending.spv || 0) + effect.extra;
+      pushLog(state, playerByIdx(state, self).name + " hands " + playerByIdx(state, targetIdx).name +
+        " " + gain + " unrest (circle " + (pending.spv || 0) + " + " + effect.extra + ").");
+      addUnrest(state, targetIdx, gain);
+      afterCollapseCheck(state, targetIdx);
+    } else if (pending.kind === "takeCircleGive") {
+      var take = pending.spv || 0;
+      pushLog(state, playerByIdx(state, self).name + " takes the circle " + take + " unrest; " +
+        playerByIdx(state, targetIdx).name + " gains " + effect.give + " unrest.");
+      addUnrest(state, self, take);
+      afterCollapseCheck(state, self);
+      if (state.phase !== "gameover") {
+        addUnrest(state, targetIdx, effect.give);
+        afterCollapseCheck(state, targetIdx);
+      }
     }
     state.pending = null;
+    if (state.phase === "gameover") return;
     state.phase = "turn";
     finishLanding(state, state.current);
   }
@@ -308,6 +370,7 @@ window.CU_Engine = (function () {
     } else {
       var c = p.heldCards.splice(cardIndex, 1)[0];
       pushLog(state, p.name + " discards held card: " + c.text);
+      spendCard(state, c);
     }
     pending.cursor++;
     if (pending.cursor >= pending.players.length) {
@@ -327,6 +390,7 @@ window.CU_Engine = (function () {
     var self = pending.from;
     addUnrest(state, self, -reduce);
     afterChange(state, self, card);
+    spendCard(state, card);
     state.pending = null;
     state.phase = "turn";
     finishLanding(state, pending.from);
@@ -378,9 +442,9 @@ window.CU_Engine = (function () {
       return;
     }
 
-    var cards = [drawFromDeck(state, kind)];
+    var cards = [drawFromDeck(state, deckKeyFor(kind, state.cfg))];
     if (extra) {
-      cards.push(drawFromDeck(state, kind));
+      cards.push(drawFromDeck(state, deckKeyFor(kind, state.cfg)));
       state.globalExtraPurple = false;
     }
     state.landed = { kind: kind, relief: false, cards: cards };
@@ -403,6 +467,8 @@ window.CU_Engine = (function () {
     }
     applyCard(state, card, pIdx, { landed: state.position });
     if (state.phase === "gameover") return;
+    var held = state.pending && state.pending.type === "holdChoice" && state.pending.card === card;
+    if (!held) spendCard(state, card);
     if (state.pending) return; /* hold / target / choice / discards set by applyCard */
     nextCardInFlight(state, pIdx);
   }
@@ -557,6 +623,7 @@ window.CU_Engine = (function () {
           pushLog(state, p.name + "'s held Election Reform Act completes — reduces unrest by " + hc.card.reduce_held + ".");
           addUnrest(state, state.current, -hc.card.reduce_held);
           p.heldCards.splice(i, 1);
+          spendCard(state, hc.card);
           afterCollapseCheck(state, state.current);
         }
       }
@@ -568,8 +635,11 @@ window.CU_Engine = (function () {
   function runCrisis(state) {
     var p = state.players[state.crisisCursor];
     if (p && p.alive) {
-      var card = drawFromDeck(state, "yellow");
-      if (card) applyCard(state, card, p.index, { spaceValue: 0 });
+      var card = drawFromDeck(state, deckKeyFor("yellow", state.cfg));
+      if (card) {
+        applyCard(state, card, p.index, { spaceValue: 0 });
+        spendCard(state, card);
+      }
     }
     state.crisisCursor++;
     if (state.crisisCursor >= state.players.length) {
@@ -682,6 +752,7 @@ window.CU_Engine = (function () {
     pushLog(state, p.name + " plays held card: " + hc.card.text + " (reduces " + reduce + ").");
     addUnrest(state, state.current, -reduce);
     afterChange(state, state.current, hc.card);
+    spendCard(state, hc.card);
   }
 
   function pickTransferTarget(state, targetIdx) {
@@ -689,7 +760,7 @@ window.CU_Engine = (function () {
     if (!pending || pending.type !== "transferTarget") return;
     var p = playerByIdx(state, pending.from);
     p.pendingPurpleTransfer = false;
-    var card = drawFromDeck(state, "purple");
+    var card = drawFromDeck(state, deckKeyFor("purple", state.cfg));
     pushLog(state, p.name + " transfers their Purple card effect to " + playerByIdx(state, targetIdx).name + ".");
     var cards = [card];
     state.landed = { kind: "purple", relief: false, cards: cards };

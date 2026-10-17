@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
 """
-Generate the digital Civil Unrest card decks (game/js/cards.js and game/js/usa.js)
-from the physical deck source files:
+Generate the digital Civil Unrest card decks (game/js/cards.js, game/js/usa.js
+and game/js/banana.js) from the physical deck source files:
 
   - CivilUnrest/Civil_Unrest_Deck_of_Cards.csv   (base game, 359 cards)
   - CivilUnrest/USA/USA.xlsx                      (master deck incl. the 36-card
     "Civil Unrest: America" expansion, ending with the black "Civil Unrest" fist deck)
+  - CivilUnrest/Banana/Banana.csv                 (the standalone 45-card
+    "Civil Unrest: Banana Republic" deck)
 
 The .csv/.xlsx files use Excel CSV-injection style encodings for special
 characters (e.g. +AC0- = "-", +ACY- = "&", +ACU- = "%", +ACI- = '"', +AFs- = "[",
 +AF0- = "]", +ALE- = "+-", +AD0- = "=", +ADs- = ";", +IBk- = "'", +AIA- = "!").
 All of those are decoded here.  Every card is parsed into a structured record the
 browser game can consume directly.
+
+openpyxl is only needed for the USA.xlsx expansion block; when it is missing the
+base + Banana decks are still generated and the existing usa.js is left alone.
 """
 
 import csv
@@ -23,14 +28,15 @@ import sys
 try:
     import openpyxl
 except ImportError:
-    print("openpyxl is required to read the master USA.xlsx deck. pip install openpyxl")
-    sys.exit(1)
+    openpyxl = None
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CSV_PATH = os.path.join(ROOT, "CivilUnrest", "Civil_Unrest_Deck_of_Cards.csv")
 XLSX_PATH = os.path.join(ROOT, "CivilUnrest", "USA", "USA.xlsx")
+BANANA_CSV = os.path.join(ROOT, "CivilUnrest", "Banana", "Banana.csv")
 OUT_CARDS = os.path.join(ROOT, "game", "js", "cards.js")
 OUT_USA = os.path.join(ROOT, "game", "js", "usa.js")
+OUT_BANANA = os.path.join(ROOT, "game", "js", "banana.js")
 
 # --------------------------------------------------------------------------
 # 1. Decode the Excel-injection artifacts
@@ -92,6 +98,30 @@ def read_base_csv():
             if key:
                 decks[key].append(card)
     return decks
+
+
+def read_banana_csv():
+    """Read the standalone Banana Republic deck.
+
+    Banana.csv is a single quoted-text column; the file repeats a "name" header
+    row (there are two), which we skip.  Each entry is one card whose trailing
+    parenthetical carries the instruction, e.g.
+        "Army fires on striking banana workers.(x2 multiplier)"
+    """
+    texts = []
+    if not os.path.exists(BANANA_CSV):
+        return texts
+    with open(BANANA_CSV, encoding="utf-8-sig", newline="") as fh:
+        for row in csv.reader(fh):
+            if not row:
+                continue
+            text = decode(row[0])
+            if not text:
+                continue
+            if text.lower() == "name":
+                continue  # header row (repeated twice in the source file)
+            texts.append(text)
+    return texts
 
 
 def category_key(cat):
@@ -250,6 +280,31 @@ def parse_effect_instruction(inst):
         return {"type": "targeted", "effect": {"action": "discardAll"},
                 "summary": "All players must discard one held card (if any)"}
 
+    # --- Banana Republic instructions ---
+    # The standalone Banana deck uses a few phrasings the base game never did.
+    red_banana = re.match(r"^Reduce\s+-(\d+)\s+unrest\s*$", inst, re.IGNORECASE)
+    if red_banana:
+        return {"type": "reduce", "reduce": int(red_banana.group(1)),
+                "summary": "Reduce unrest by {}".format(red_banana.group(1))}
+
+    all_players = re.match(r"^All players get ([+-]?\d+)\s*$", inst)
+    if all_players:
+        val = int(all_players.group(1))
+        return {"type": "targeted", "effect": {"action": "allPlayers", "val": val},
+                "summary": "All players gain {} unrest".format(val)}
+
+    give_plus = re.match(r"^Give circle points \+ (\d+) more to another player\s*$", inst)
+    if give_plus:
+        extra = int(give_plus.group(1))
+        return {"type": "targeted", "effect": {"action": "giveCirclePlus", "extra": extra},
+                "summary": "Give another player the circle value plus {} more".format(extra)}
+
+    take_give = re.match(r"^Take circle points and give another player \+(\d+)\s*$", inst)
+    if take_give:
+        give = int(take_give.group(1))
+        return {"type": "targeted", "effect": {"action": "takeCircleGive", "give": give},
+                "summary": "Take the circle value; give another player +{}".format(give)}
+
     if re.match(r"^[Uu]se (?:Card Value|Value of Circle)", inst):
         return {"type": "space", "summary": "Use Card Value"}
 
@@ -307,27 +362,35 @@ def main():
     # "Civil Unrest: America" expansion block (6 cards each in the red, blue,
     # green, purple, orange and black categories = 36 cards).  Locate that
     # block by its known first card and take everything from there on.
-    master = read_master_xlsx()
-    america = {"decks": {"green": [], "yellow": [], "blue": [], "purple": [], "orange": [], "red": []},
-               "black": []}
+    # openpyxl is optional: without it we simply leave the existing usa.js alone.
+    america = None
+    if openpyxl is None:
+        print("NOTE: openpyxl not installed — skipping the USA.xlsx America expansion.")
+        print("      (existing game/js/usa.js is left unchanged)")
+    elif not os.path.exists(XLSX_PATH):
+        print("NOTE: " + XLSX_PATH + " not found — leaving existing usa.js unchanged.")
+    else:
+        master = read_master_xlsx()
+        america = {"decks": {"green": [], "yellow": [], "blue": [], "purple": [], "orange": [], "red": []},
+                   "black": []}
 
-    america_rows = None
-    for i, (cat, text) in enumerate(master):
-        if text.startswith("Attempt to invalidate certified results"):
-            america_rows = master[i:]
-            break
-    if not america_rows:
-        print("ERROR: could not locate the America expansion block in", XLSX_PATH)
-        sys.exit(1)
+        america_rows = None
+        for i, (cat, text) in enumerate(master):
+            if text.startswith("Attempt to invalidate certified results"):
+                america_rows = master[i:]
+                break
+        if not america_rows:
+            print("ERROR: could not locate the America expansion block in", XLSX_PATH)
+            sys.exit(1)
 
-    for cat, text in america_rows:
-        key = category_key(cat)
-        if not key:
-            continue
-        if key == "black":
-            america["black"].append(text)
-        else:
-            america["decks"][key].append(text)
+        for cat, text in america_rows:
+            key = category_key(cat)
+            if not key:
+                continue
+            if key == "black":
+                america["black"].append(text)
+            else:
+                america["decks"][key].append(text)
 
     # Build structured output
     categories = {
@@ -345,18 +408,28 @@ def main():
                    "color": "#b73a28"},
         "black":  {"name": "Civil Unrest", "sub": "America expansion \u00b7 drawn on fist spaces",
                    "color": "#1b1a15"},
+        "banana": {"name": "Banana Republic",
+                   "sub": "Banana Republic expansion \u00b7 standalone deck",
+                   "color": "#426e7d"},
     }
 
     decks = {}
     for key, texts in base.items():
         decks[key] = [build_card(key, t, i) for i, t in enumerate(texts)]
 
-    america_out = {"decks": {}, "black": []}
-    for key, texts in america["decks"].items():
-        america_out["decks"][key] = [build_card(key, t, i, expansion="america")
-                                     for i, t in enumerate(texts)]
-    america_out["black"] = [build_card("black", t, i, expansion="america")
-                            for i, t in enumerate(america["black"])]
+    america_out = None
+    if america is not None:
+        america_out = {"decks": {}, "black": []}
+        for key, texts in america["decks"].items():
+            america_out["decks"][key] = [build_card(key, t, i, expansion="america")
+                                         for i, t in enumerate(texts)]
+        america_out["black"] = [build_card("black", t, i, expansion="america")
+                                for i, t in enumerate(america["black"])]
+
+    banana_texts = read_banana_csv()
+    banana_out = {"expansion": "banana", "deck": []}
+    for i, t in enumerate(banana_texts):
+        banana_out["deck"].append(build_card("banana", t, i, expansion="banana"))
 
     def jsdump(obj):
         return json.dumps(obj, indent=1, ensure_ascii=False)
@@ -369,23 +442,35 @@ def main():
         fh.write(jsdump({"categories": categories, "decks": decks}))
         fh.write(";\n")
 
-    with open(OUT_USA, "w", encoding="utf-8") as fh:
-        fh.write("/* AUTO-GENERATED by tools/generate_deck.py from the Civil Unrest: America expansion (USA.xlsx). */\n")
-        fh.write("window.CU_AMERICA = ")
-        fh.write(jsdump(america_out))
+    if america_out is not None:
+        with open(OUT_USA, "w", encoding="utf-8") as fh:
+            fh.write("/* AUTO-GENERATED by tools/generate_deck.py from the Civil Unrest: America expansion (USA.xlsx). */\n")
+            fh.write("window.CU_AMERICA = ")
+            fh.write(jsdump(america_out))
+            fh.write(";\n")
+
+    with open(OUT_BANANA, "w", encoding="utf-8") as fh:
+        fh.write("/* AUTO-GENERATED by tools/generate_deck.py from the Civil Unrest: Banana Republic deck "
+                 "(Banana.csv). */\n")
+        fh.write("window.CU_BANANA = ")
+        fh.write(jsdump(banana_out))
         fh.write(";\n")
 
     total = sum(len(d) for d in decks.values())
-    amer = sum(len(d) for d in america_out["decks"].values()) + len(america_out["black"])
     print("Base cards:", total)
     for k, v in decks.items():
         print("   {:7} {}".format(k, len(v)))
-    print("America cards:", amer)
-    for k, v in america_out["decks"].items():
-        print("   {:7} {}".format(k, len(v)))
-    print("   black  ", len(america_out["black"]))
+    if america_out is not None:
+        amer = sum(len(d) for d in america_out["decks"].values()) + len(america_out["black"])
+        print("America cards:", amer)
+        for k, v in america_out["decks"].items():
+            print("   {:7} {}".format(k, len(v)))
+        print("   black  ", len(america_out["black"]))
+    print("Banana Republic cards:", len(banana_out["deck"]))
     print("Wrote", OUT_CARDS)
-    print("Wrote", OUT_USA)
+    if america_out is not None:
+        print("Wrote", OUT_USA)
+    print("Wrote", OUT_BANANA)
 
 
 if __name__ == "__main__":

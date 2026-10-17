@@ -35,6 +35,11 @@ window.CU_CARDS = {
    "name": "Civil Unrest",
    "sub": "America expansion · drawn on fist spaces",
    "color": "#1b1a15"
+  },
+  "banana": {
+   "name": "Banana Republic",
+   "sub": "Banana Republic expansion · standalone deck",
+   "color": "#426e7d"
   }
  },
  "decks": {

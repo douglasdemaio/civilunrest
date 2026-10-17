@@ -35,6 +35,7 @@
             <label class="opt"><input type="checkbox" id="opt-tyrant" /> <span><b>Tyrant Victory</b> — +25 unrest within 3 consecutive turns wins instantly.</span></label>
             <label class="opt"><input type="checkbox" id="opt-crisis" /> <span><b>Crisis Mode</b> — every 5 rounds everyone draws a random Yellow card.</span></label>
             <label class="opt"><input type="checkbox" id="opt-america" /> <span><b>Civil Unrest: America</b> — mixes the expansion deck in and activates fist spaces.</span></label>
+            <label class="opt"><input type="checkbox" id="opt-banana" /> <span><b>Civil Unrest: Banana Republic</b> — swaps in the standalone 45-card Banana Republic deck.</span></label>
             <label class="opt"><input type="checkbox" id="opt-twodice" /> <span><b>Two Dice Economy</b></span>
               <select id="twodice-mode" class="subselect" disabled>
                 <option value="total">Use total</option>
@@ -51,6 +52,7 @@
 
       <div class="setup-buy">
         <p>Enjoying the digital edition? <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener">Order the physical game on The Game Crafter</a> &bull; <a href="https://www.thegamecrafter.com/games/civil-unrest:-america" target="_blank" rel="noopener">America expansion</a></p>
+        <form action="https://www.thegamecrafter.com/cart/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" style="display: inline;"><button type="submit" class="btn btn-buy">Add Civil Unrest To Cart</button></form>
       </div>
     </div>
   </section>
@@ -66,7 +68,8 @@
       <div class="topbar-actions">
         <button id="rules-btn" class="btn btn-ghost">Rules</button>
         <button id="newgame-btn" class="btn btn-ghost">New Game</button>
-        <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener" class="btn btn-buy">Buy the Physical Game</a>
+        <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener" class="btn btn-ghost">Physical Game</a>
+        <form action="https://www.thegamecrafter.com/cart/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" style="display: inline;"><button type="submit" class="btn btn-buy">Add Civil Unrest To Cart</button></form>
       </div>
     </header>
 
@@ -98,6 +101,7 @@
   <script src="js/board.js"></script>
   <script src="js/cards.js"></script>
   <script src="js/usa.js"></script>
+  <script src="js/banana.js"></script>
   <script src="js/engine.js"></script>
   <script src="js/ai.js"></script>
   <script src="js/ui.js"></script>

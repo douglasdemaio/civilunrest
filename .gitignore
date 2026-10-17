@@ -1,5 +1,7 @@
 _site
 .jekyll-cache
+__pycache__/
+*.pyc
 flatpak/build/
 flatpak/repo/
 flatpak/.flatpak-builder/

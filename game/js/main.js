@@ -88,7 +88,8 @@
       crisisMode: document.getElementById("opt-crisis").checked,
       reformVictory: document.getElementById("opt-reform").checked,
       tyrantVictory: document.getElementById("opt-tyrant").checked,
-      america: document.getElementById("opt-america").checked
+      america: document.getElementById("opt-america").checked,
+      banana: document.getElementById("opt-banana").checked
     };
     startGame();
   });
@@ -269,6 +270,18 @@
           intro = "You gain " + fmt(pending.effect.self) + "; choose one player to lose " + (-pending.effect.target) + ":";
           state.players.forEach(function (p) { if (p.alive) legal.push(p.index); });
           break;
+        case "giveCirclePlus":
+          title = "Hand Out Unrest";
+          intro = "Choose another player to gain <b>" + fmt((pending.spv || 0) + pending.effect.extra) +
+            "</b> unrest (circle " + (pending.spv || 0) + " + " + pending.effect.extra + "):";
+          state.players.forEach(function (p) { if (p.alive && p.index !== self) legal.push(p.index); });
+          break;
+        case "takeCircleGive":
+          title = "Redirect the Circle";
+          intro = "You take the circle value (<b>" + fmt(pending.spv || 0) +
+            "</b> unrest); choose another player to gain <b>" + fmt(pending.effect.give) + "</b> unrest:";
+          state.players.forEach(function (p) { if (p.alive && p.index !== self) legal.push(p.index); });
+          break;
       }
     }
 
@@ -416,7 +429,8 @@
       '<div class="modal-actions">' +
       '<button class="btn btn-primary" id="m-again">Play Again</button>' +
       '<button class="btn" id="m-setup">New Game Setup</button></div>' +
-      '<p style="text-align:center;margin-top:14px">Prefer the tabletop? <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener">Order the physical game</a>.</p>';
+      '<p style="text-align:center;margin-top:14px">Prefer the tabletop? <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener">Order the physical game</a> or ' +
+      '<form action="https://www.thegamecrafter.com/cart/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" style="display:inline"><button type="submit" class="btn btn-buy">Add Civil Unrest To Cart</button></form></p>';
     UI.openModal(html);
     document.getElementById("m-again").onclick = function () { UI.closeModal(); startGame(); };
     document.getElementById("m-setup").onclick = function () { UI.closeModal(); showSetup(); };
@@ -434,8 +448,9 @@
         "<li><b>Red reform cards</b> reduce unrest; some may be held and played on later turns.</li>" +
         "<li><b>+→ spaces</b> (one per color): the first to land may purchase for +10 unrest, then award +5 to another; if declined, later landers may award +2.</li>" +
         "<li><b>Logo relief spaces</b> cause no events. Fist spaces activate the America expansion deck.</li>" +
-      "<li><b>Collapse:</b> reach 100 unrest and you're eliminated.</li>" +
-      "<li><b>Optional:</b> Reform Victory, Tyrant Victory, Crisis Mode, Two Dice Economy, America expansion.</li>" +
+        "<li><b>Banana Republic</b> swaps in the standalone 45-card Banana Republic deck — every colored space then draws a Banana card, using that space's circle value.</li>" +
+        "<li><b>Collapse:</b> reach 100 unrest and you're eliminated.</li>" +
+        "<li><b>Optional:</b> Reform Victory, Tyrant Victory, Crisis Mode, Two Dice Economy, America expansion, Banana Republic expansion.</li>" +
       "</ul>" +
       '<div class="modal-actions"><button class="btn" id="m-rules-ok">Got it</button></div>'
     );

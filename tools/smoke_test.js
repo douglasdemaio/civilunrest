@@ -3,7 +3,7 @@ const path = require("path");
 
 global.window = {};
 const jsdir = path.join(__dirname, "..", "game", "js");
-for (const f of ["board.js", "cards.js", "usa.js", "engine.js", "ai.js"]) {
+for (const f of ["board.js", "cards.js", "usa.js", "banana.js", "engine.js", "ai.js"]) {
   eval(fs.readFileSync(path.join(jsdir, f), "utf8"));
 }
 const E = window.CU_Engine;
@@ -32,6 +32,14 @@ function drive(state) {
     switch (state.phase) {
       case "crisis":
         E.runCrisis(state); continue;
+      case "rolled":
+        E.move(state); continue;
+      case "landed":
+        E.resolveLanding(state); continue;
+      case "arrow":
+        if (state.pending && state.pending.type === "arrowBuy") E.arrowBuy(state, false);
+        else E.arrowSkipAward(state);
+        continue;
       case "choice":
         if (state.pending) E.declareVictory(state);
         continue;
@@ -115,8 +123,15 @@ console.log("(note: " + 30 + " full games completed)");
 let s6 = makeGame({ crisisMode: true });
 let sawCrisis = false;
 let guard = 0;
-while (guard++ < 3000 && s6.phase !== "gameover") {
+while (guard++ < 20000 && s6.phase !== "gameover") {
   if (s6.phase === "crisis") { sawCrisis = true; E.runCrisis(s6); continue; }
+  if (s6.phase === "rolled") { E.move(s6); continue; }
+  if (s6.phase === "landed") { E.resolveLanding(s6); continue; }
+  if (s6.phase === "arrow") {
+    if (s6.pending && s6.pending.type === "arrowBuy") E.arrowBuy(s6, false);
+    else E.arrowSkipAward(s6);
+    continue;
+  }
   if (s6.phase === "choice" && s6.pending) { E.declareVictory(s6); continue; }
   if (s6.phase === "discard") { const i = E.nextPlayerForDiscard(s6); const p = s6.players[i]; E.resolveDiscard(s6, p.heldCards.length ? 0 : null); continue; }
   if (s6.phase === "hold") { const f = s6.pending.from; const p = s6.players[f]; if (p.unrest >= 60 && s6.pending.immediateReduce >= 5) E.holdNow(s6); else E.holdForLater(s6); continue; }
@@ -160,6 +175,70 @@ E.playHeld(s13, 0);
 check("reform victory offered at 3rd streak under 20", s13.phase === "choice" && s13.pending.type === "reformVictory");
 E.declareVictory(s13);
 check("reform victory declared", s13.phase === "gameover" && s13.winner === 0);
+
+// 10. Banana Republic expansion
+check("banana deck when banana on", !!makeGame({ banana: true }).decks.banana);
+check("no banana deck when banana off", !makeGame({ banana: false }).decks.banana);
+
+// Colored event spaces draw from the Banana deck when enabled.
+let sb = makeGame({ banana: true, america: false, reformVictory: false, tyrantVictory: false });
+const gSp = window.CU_BOARD.spaces.findIndex(sp => sp.kind === "green" && sp.value > 0);
+sb.current = 0; sb.players[0].position = gSp; sb.position = gSp; sb.phase = "landed";
+E.resolveLanding(sb);
+check("colored space draws banana card", sb.landed && sb.landed.cards && sb.landed.cards[0] &&
+  sb.landed.cards[0].category === "banana");
+
+// giveCirclePlus: target gains circle value + extra.
+let s14 = makeGame({ banana: true, america: false, reformVictory: false, tyrantVictory: false });
+s14.players[0].unrest = 10; s14.players[1].unrest = 20;
+const gc = window.CU_BANANA.deck.find(c => c.type === "targeted" && c.effect.action === "giveCirclePlus");
+const gSpace3 = window.CU_BOARD.spaces.findIndex(sp => sp.kind === "green" && sp.value === 3);
+s14.decks.banana.draw = [gc];
+s14.current = 0; s14.players[0].position = gSpace3; s14.position = gSpace3; s14.phase = "landed";
+E.resolveLanding(s14);
+check("giveCirclePlus enters target phase", s14.phase === "target" && s14.pending.kind === "giveCirclePlus");
+E.resolveTarget(s14, 1);
+check("giveCirclePlus grants circle+2", s14.players[1].unrest === 20 + 3 + 2);
+check("giveCirclePlus leaves self untouched", s14.players[0].unrest === 10);
+
+// allPlayers: every alive player gains the value.
+let s15 = makeGame({ banana: true, america: false, reformVictory: false, tyrantVictory: false });
+s15.players.forEach(p => { p.unrest = 10; });
+const ac = window.CU_BANANA.deck.find(c => c.type === "targeted" && c.effect.action === "allPlayers");
+const gSp2 = window.CU_BOARD.spaces.findIndex(sp => sp.kind === "green" && sp.value === 2);
+s15.decks.banana.draw = [ac];
+s15.current = 0; s15.players[0].position = gSp2; s15.position = gSp2; s15.phase = "landed";
+E.resolveLanding(s15);
+check("allPlayers grants everyone the value", s15.players.every(p => p.unrest === 10 + ac.effect.val));
+
+// takeCircleGive: self takes the circle value, target gains the hand-out.
+let s16 = makeGame({ banana: true, america: false, reformVictory: false, tyrantVictory: false });
+s16.players[0].unrest = 0; s16.players[1].unrest = 5;
+const tg = window.CU_BANANA.deck.find(c => c.effect && c.effect.action === "takeCircleGive");
+const gSp1 = window.CU_BOARD.spaces.findIndex(sp => sp.kind === "green" && sp.value === 1);
+s16.decks.banana.draw = [tg];
+s16.current = 0; s16.players[0].position = gSp1; s16.position = gSp1; s16.phase = "landed";
+E.resolveLanding(s16);
+check("takeCircleGive enters target phase", s16.phase === "target" && s16.pending.kind === "takeCircleGive");
+E.resolveTarget(s16, 1);
+check("takeCircleGive applies to both players", s16.players[0].unrest === 1 && s16.players[1].unrest === 5 + tg.effect.give);
+
+// Banana + America together: fist spaces still draw the black deck.
+let s17 = makeGame({ banana: true, america: true });
+const fistSp = window.CU_BOARD.spaces.findIndex(sp => sp.kind === "black");
+s17.current = 0; s17.players[0].position = fistSp; s17.position = fistSp; s17.phase = "landed";
+E.resolveLanding(s17);
+check("fist spaces still draw America black with banana on",
+  s17.landed && s17.landed.cards && s17.landed.cards[0] && s17.landed.cards[0].expansion === "america");
+
+// 11. Full simulated games with the Banana deck enabled.
+let allEndedBanana = true;
+for (let seed = 0; seed < 20; seed++) {
+  const g = makeGame({ banana: true, america: true });
+  drive(g);
+  if (g.phase !== "gameover") { allEndedBanana = false; failures++; console.log("FAIL: banana game " + seed + " phase=" + g.phase); }
+}
+check("20 Banana games all ended", allEndedBanana);
 
 console.log(failures ? failures + " FAILURES" : "ALL CHECKS PASSED");
 process.exit(failures ? 1 : 0);

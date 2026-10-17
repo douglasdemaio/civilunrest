@@ -128,6 +128,11 @@ window.CU_AI = (function () {
           /* relief to a rival loses them points — harm the most fragile */
           target = (eff.effect.target < 0) ? me : highestUnrestOpponent(state, me);
           break;
+        case "giveCirclePlus":
+        case "takeCircleGive":
+          /* Banana Republic: push the unrest at whichever rival is closest to collapse */
+          target = highestUnrestOpponent(state, me);
+          break;
         default:
           target = highestUnrestOpponent(state, me);
       }
