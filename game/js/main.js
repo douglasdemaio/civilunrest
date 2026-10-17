@@ -430,7 +430,7 @@
       '<button class="btn btn-primary" id="m-again">Play Again</button>' +
       '<button class="btn" id="m-setup">New Game Setup</button></div>' +
       '<p style="text-align:center;margin-top:14px">Prefer the tabletop? <a href="https://www.thegamecrafter.com/games/civil-unrest1" target="_blank" rel="noopener">Order the physical game</a> or ' +
-      '<form action="https://www.thegamecrafter.com/cart/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" style="display:inline"><button type="submit" class="btn btn-buy">Add Civil Unrest To Cart</button></form></p>';
+      '<form action="https://www.thegamecrafter.com/checkout/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" style="display:inline"><button type="submit" class="btn btn-buy">Buy Civil Unrest</button></form></p>';
     UI.openModal(html);
     document.getElementById("m-again").onclick = function () { UI.closeModal(); startGame(); };
     document.getElementById("m-setup").onclick = function () { UI.closeModal(); showSetup(); };

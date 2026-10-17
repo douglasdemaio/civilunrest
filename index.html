@@ -146,6 +146,15 @@
     }
     .expansion-features li { padding: 6px 0; font-size: 1em; }
     .expansion-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .expansion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; align-items: start; }
+    .expansion-card.banana { border-color: #426e7d; background: linear-gradient(135deg, #2f4a55, #22343c); }
+    .expansion-card.banana .expansion-badge { background: #426e7d; }
+    .expansion-card .expansion-cta .btn-primary,
+    .expansion-card .expansion-cta .btn-secondary { font-size: 0.95em; padding: 12px 28px; }
+    .buy-form { display: inline; }
+    .buy-form .btn-primary,
+    .buy-form .btn-secondary,
+    .buy-form .buy-btn { font-family: 'Oswald', sans-serif; }
 
     /* CTA banner */
     .cta-banner {
@@ -184,7 +193,7 @@
     </a>
     <div class="nav-actions">
       <a href="game/" class="play-btn">Play Online</a>
-      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="buy-btn">Buy Now</a>
+      <form action="https://www.thegamecrafter.com/checkout/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" class="buy-form"><button type="submit" class="buy-btn">Buy Civil Unrest</button></form>
     </div>
   </nav>
 
@@ -196,7 +205,7 @@
     <img src="Box.png" alt="Civil Unrest Board Game Box" class="box-img"/>
     <div class="cta-group">
       <a href="game/" class="btn-primary">Play Free Online</a>
-      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order Your Copy</a>
+      <form action="https://www.thegamecrafter.com/checkout/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" class="buy-form"><button type="submit" class="btn-primary">Buy Civil Unrest</button></form>
       <a href="#how-to-play" class="btn-secondary">Learn More</a>
     </div>
   </section>
@@ -295,7 +304,7 @@
     <hr class="divider"/>
     <p class="about-text">
       Play the full board game free in your browser — six crisis categories, 350+ event cards, the
-      America expansion, AI opponents, and every optional rule. It also ships as a Linux
+      America and Banana Republic expansions, AI opponents, and every optional rule. It also ships as a Linux
       flatpak. Try the storm before you buy it.
     </p>
     <div class="cta-group" style="margin-top:32px">
@@ -308,21 +317,41 @@
   <section id="expansion">
     <h2>Expand the Chaos</h2>
     <hr class="divider"/>
-    <div class="expansion-card">
-      <div class="expansion-badge">EXPANSION PACK</div>
-      <h3>Civil Unrest: America</h3>
-      <p class="expansion-desc">
-        Add a high-stakes deck that introduces political turmoil unique to the Americas. Corruption, cartel spillover, election chaos, and regional power struggles — drawn whenever you land on a fist icon. Same core rules, amplified tension.
-      </p>
-      <ul class="expansion-features">
-        <li>🇺🇸 America-themed event cards</li>
-        <li>✊ Triggered by fist icon landings</li>
-        <li>🔥 Intensifies crises across all six categories</li>
-        <li>🧩 Seamless integration — no rule changes</li>
-      </ul>
-      <div class="expansion-cta">
-        <a href="https://www.thegamecrafter.com/games/civil-unrest:-america" class="btn-primary">Get the Expansion</a>
-        <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-secondary">Get the Base Game</a>
+    <div class="expansion-grid">
+      <div class="expansion-card">
+        <div class="expansion-badge">EXPANSION PACK</div>
+        <h3>Civil Unrest: America</h3>
+        <p class="expansion-desc">
+          Add a high-stakes deck that introduces political turmoil unique to the Americas. Corruption, cartel spillover, election chaos, and regional power struggles — drawn whenever you land on a fist icon. Same core rules, amplified tension.
+        </p>
+        <ul class="expansion-features">
+          <li>🇺🇸 America-themed event cards</li>
+          <li>✊ Triggered by fist icon landings</li>
+          <li>🔥 Intensifies crises across all six categories</li>
+          <li>🧩 Seamless integration — no rule changes</li>
+        </ul>
+        <div class="expansion-cta">
+          <form action="https://www.thegamecrafter.com/cart/sku/373A90FA-C316-11F0-B439-40AC5D5BEA59" method="POST" class="buy-form"><button type="submit" class="btn-primary">Add America To Cart</button></form>
+          <a href="game/" class="btn-secondary">Play It Free</a>
+        </div>
+      </div>
+
+      <div class="expansion-card banana">
+        <div class="expansion-badge">STANDALONE DECK</div>
+        <h3>Civil Unrest: Banana Republic</h3>
+        <p class="expansion-desc">
+          A complete alternate deck that drops you into a banana republic — a foreign fruit company owns the land, the army protects its interests, and reform is always one coup away. Swap it in for a whole new game: every colored space draws a Banana Republic card.
+        </p>
+        <ul class="expansion-features">
+          <li>🍌 45-card standalone event deck</li>
+          <li>🔄 Replaces the six color decks — every space draws from it</li>
+          <li>🏛️ Fruit companies, coups, junta rule, land reform</li>
+          <li>💻 Play it free in the Digital Edition</li>
+        </ul>
+        <div class="expansion-cta">
+          <a href="game/" class="btn-primary">Play Banana Republic</a>
+          <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-secondary">Get the Base Game</a>
+        </div>
       </div>
     </div>
   </section>
@@ -330,10 +359,10 @@
   <!-- CTA BANNER -->
   <section class="cta-banner">
     <h2>Ready to Start the Revolution?</h2>
-    <p>Get the base game — then supercharge it with the America expansion.</p>
+    <p>Get the base game — then supercharge it with the America expansion or the Banana Republic deck.</p>
     <div class="cta-group">
-      <a href="https://www.thegamecrafter.com/games/civil-unrest1" class="btn-primary">Order the Game</a>
-      <a href="https://www.thegamecrafter.com/games/civil-unrest:-america" class="btn-secondary">Add America Pack</a>
+      <form action="https://www.thegamecrafter.com/checkout/sku/53265CA6-5CAD-11F0-821A-C4C3EF7A371D" method="POST" class="buy-form"><button type="submit" class="btn-primary">Buy Civil Unrest</button></form>
+      <a href="game/" class="btn-secondary">Play Free Online</a>
     </div>
   </section>
 
